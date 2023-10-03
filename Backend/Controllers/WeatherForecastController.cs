@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase {
@@ -19,6 +18,7 @@ public class WeatherForecastController : ControllerBase {
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
+    [Authorize(Roles = "User")]
     public IEnumerable<WeatherForecast> Get() {
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
