@@ -1,10 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend", "Backend\Backend.csproj", "{64FD891A-52AE-4F73-8485-165B4AA5A8A4}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backend", "Backend\Backend.csproj", "{64FD891A-52AE-4F73-8485-165B4AA5A8A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{F2596284-E17D-4848-ACBE-258F35AE4C26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{F2596284-E17D-4848-ACBE-258F35AE4C26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frontend", "Frontend\Frontend.csproj", "{76B3431C-B26A-4357-9D5F-A0E86E2CBE24}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frontend", "Frontend\Frontend.csproj", "{76B3431C-B26A-4357-9D5F-A0E86E2CBE24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +27,8 @@ Global
 		{76B3431C-B26A-4357-9D5F-A0E86E2CBE24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76B3431C-B26A-4357-9D5F-A0E86E2CBE24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76B3431C-B26A-4357-9D5F-A0E86E2CBE24}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

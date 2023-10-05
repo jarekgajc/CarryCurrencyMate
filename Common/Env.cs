@@ -1,5 +1,5 @@
 ﻿namespace Common; 
 
 public static class Env {
-    public const string Backend = "https://localhost:7041";
+    public const string Backend = "http://localhost:5225";
 }
