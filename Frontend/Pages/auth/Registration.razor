@@ -1,4 +1,5 @@
 ﻿@page "/auth/registration"
+@inject HttpClient HttpClient;
 @inject NavigationManager Navigation
 
 <MudContainer MaxWidth="MaxWidth.Small">
@@ -14,6 +15,7 @@
             <MudTextField @bind-Value="RepeatPassword" Label="Repeat Password" Variant="Variant.Text" InputType="InputType.Password"/>
         </MudCardContent>
         <MudCardActions>
+            <MudButton Variant="Variant.Text" Color="Color.Secondary" @onclick="Register">Sign in</MudButton>
             <MudSpacer/>
             <MudButton Variant="Variant.Text" Color="Color.Primary" @onclick="Register">Sign up</MudButton>
         </MudCardActions>
@@ -22,11 +24,16 @@
 
 @code {
     public string RepeatPassword { get; set; }
-    public UserDto UserDto { get; set; }
+    public UserDto UserDto { get; set; } = new UserDto();
 
     public async void Register()
     {
-        HttpResponseMessage response = await new HttpClient().PostAsJsonAsync("auth/register", UserDto);
+        HttpResponseMessage response = await HttpClient.PostAsJsonAsync($"{Env.Backend}/auth/register", UserDto);
+        GoToLogin();
+    }
+
+    public void GoToLogin()
+    {
         Navigation.NavigateToLogin("auth/login");
     }
 }

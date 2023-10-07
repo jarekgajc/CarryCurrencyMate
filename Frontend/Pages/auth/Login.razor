@@ -1,7 +1,6 @@
 ﻿@page "/auth/login"
-@using System.Text.Json;
 @inject NavigationManager Navigation
-@inject HttpClient httpClient;
+@inject HttpClient HttpClient;
 @inject AuthProvider authProvider;
 
 
@@ -9,7 +8,7 @@
     <MudCard Outlined="true">
         <MudCardHeader>
             <CardHeaderContent>
-                <MudText Typo="Typo.h6">Sign up</MudText>
+                <MudText Typo="Typo.h6">Sign in</MudText>
             </CardHeaderContent>
         </MudCardHeader>
         <MudCardContent>
@@ -29,9 +28,9 @@
 
     public async void LogIn()
     {
-        HttpResponseMessage response = await httpClient.PostAsJsonAsync("auth/login", UserDto);
-        string? token = await JsonSerializer.DeserializeAsync<string>(await response.Content.ReadAsStreamAsync());
-        if(token != null)
+        HttpResponseMessage response = await HttpClient.PostAsJsonAsync($"{Env.Backend}/api/auth/login", UserDto);
+        string token = await response.Content.ReadAsStringAsync();
+        if(!string.IsNullOrEmpty(token))
             authProvider.Authenticate(token);
     }
 
