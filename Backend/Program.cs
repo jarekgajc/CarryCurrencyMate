@@ -1,5 +1,6 @@
 using Backend.Data;
 using Backend.Services.AccountService;
+using Backend.Utils.Middleware;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -43,6 +44,7 @@ if (app.Environment.IsDevelopment()) {
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

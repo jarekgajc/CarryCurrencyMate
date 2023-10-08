@@ -1,4 +1,4 @@
-﻿namespace Backend.Models.Account
+﻿namespace Common.Models.Account
 {
     public class Account
     {

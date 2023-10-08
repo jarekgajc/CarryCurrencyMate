@@ -1,0 +1,80 @@
+﻿@inject ISnackbar Snackbar
+
+<MudElement HtmlTag="div" Style="position:relative;width:100%;height:100%">
+    @if (Loading)
+    {
+        <MudElement HtmlTag="div" Style="position:absolute;width:100%;height:100%;background-color:rgba(0.4, 0.4, 0.4, 0.4)">
+            <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true" Style="height:100%;">
+                <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+            </MudStack>
+        </MudElement>
+    }
+    <CascadingValue Value="LoadRequest">
+        @ChildContent
+    </CascadingValue>
+</MudElement>
+
+
+@code {
+    public bool Loading { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    public LoadRequest LoadRequest { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        LoadRequest = async (load) =>
+        {
+            try
+            {
+                Loading = true;
+                await Task.Delay(1000);
+                HttpResponseMessage response = await load();
+                if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    var apiError = await response.Content.ReadFromJsonAsync<ApiError>();
+                    if (apiError != null)
+                    {
+                        ShowError(apiError.Code.ToString());
+                    } else
+                    {
+                        ShowHttpStatusCodeError(response.StatusCode);
+                    }
+                    return null;
+                }
+                return response;
+            } catch (HttpRequestException e)
+            {
+                if (e.StatusCode != null)
+                {
+                    ShowHttpStatusCodeError(e.StatusCode);
+                } else
+                {
+                    ShowError("Something went wrong");
+                }
+            } finally
+            {
+                Loading = false;
+                StateHasChanged();
+            }
+            return null;
+        };
+    }
+
+    public void ShowHttpStatusCodeError(HttpStatusCode? httpStatusCode)
+    {
+        if(httpStatusCode != null)
+        {
+            ShowError(httpStatusCode + "");
+        }
+        else
+        {
+            ShowError("Something went wrong");
+        }
+    }
+
+    public void ShowError(string error)
+    {
+        Snackbar.Add(error, Severity.Error);
+    }
+}

@@ -1,5 +1,7 @@
-﻿using Backend.Models.Account;
+﻿using Backend.Models.Exception;
 using Backend.Services.AccountService;
+using Common.Models.Account;
+using Common.Models.Error.Api;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -16,8 +18,8 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        public async Task<List<Account>> GetAccounts()
-        {
+        public async Task<List<Account>> GetAccounts() {
+            throw new ApiException(new CredentialsNotFound());
             return await accountService.GetAccounts();
         }
 

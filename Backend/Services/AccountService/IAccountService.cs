@@ -1,4 +1,4 @@
-﻿using Backend.Models.Account;
+﻿using Common.Models.Account;
 
 namespace Backend.Services.AccountService
 {

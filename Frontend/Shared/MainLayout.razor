@@ -5,7 +5,7 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-
+        
     <AuthorizeView>
         <Authorized>
             <MudAppBar Elevation="0">
@@ -30,11 +30,12 @@
     </AuthorizeView>
 
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
-            @Body
-        </MudContainer>
+        <RequestLoader>
+            <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
+                     @Body
+            </MudContainer>
+        </RequestLoader>
     </MudMainContent>
-    
     
 </MudLayout>
 

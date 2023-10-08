@@ -1,5 +1,5 @@
 ﻿using Backend.Data;
-using Backend.Models.Account;
+using Common.Models.Account;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services.AccountService
