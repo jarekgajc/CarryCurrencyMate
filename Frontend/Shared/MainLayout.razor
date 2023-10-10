@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using Frontend.Shared.Account
+@inherits LayoutComponentBase
 
 <MudThemeProvider IsDarkMode="true"/>
 <MudDialogProvider />
@@ -32,7 +33,16 @@
     <MudMainContent>
         <RequestLoader>
             <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
-                     @Body
+                <AuthorizeView>
+                    <Authorized>
+                        <CascadinAccountState>
+                            @Body
+                        </CascadinAccountState>
+                    </Authorized>
+                    <NotAuthorized>
+                        @Body
+                    </NotAuthorized>
+                </AuthorizeView>
             </MudContainer>
         </RequestLoader>
     </MudMainContent>

@@ -1,59 +1,74 @@
 ﻿using Backend.Data;
+using Backend.Models.Exception;
 using Common.Models.Account;
+using Common.Models.Error.Api;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services.AccountService
 {
     public class AccountService : IAccountService
     {
-        private readonly DataContext dataContext;
+        private readonly DataContext _dataContext;
 
         public AccountService(DataContext dataContext)
         {
-            this.dataContext = dataContext;
+            _dataContext = dataContext;
         }
 
         public async Task<List<Account>> GetAccounts()
         {
-            return await dataContext.Accounts.ToListAsync();
+            return await _dataContext.Accounts.ToListAsync();
         }
 
         public async Task<Account?> GetAccount(int id)
         {
-            return await dataContext.Accounts.FindAsync(id);
+            return await _dataContext.Accounts.FindAsync(id);
+        }
+
+        //TODO: store user id in Account
+        public async Task<Account> GetUserAccount(int userId)
+        {
+            Account? account = await _dataContext.Accounts.FindAsync(userId);
+            if(account == null)
+            {
+                account = await CreateAccount(new Account
+                {
+                    UserId = userId
+                });
+            }
+            return account;
         }
 
         public async Task<Account> CreateAccount(Account account)
         {
-            dataContext.Accounts.Add(account);
-            await dataContext.SaveChangesAsync();
+            _dataContext.Accounts.Add(account);
+            await _dataContext.SaveChangesAsync();
 
             return account;
         }
 
-        public async Task<Account?> UpdateAccount(int id, Account account)
+        public async Task<Account> UpdateAccount(int id, Account account)
         {
-            var current = await dataContext.Accounts.FindAsync(id);
-            if (current == null)
+            if (id != account.Id)
             {
-                return null;
+                throw new ApiException(new ResourceDoesNotExist());
             }
-
-            await dataContext.SaveChangesAsync();
+            var current = await _dataContext.Accounts.FindAsync(id) ?? throw new ApiException(new ResourceDoesNotExist());
+            await _dataContext.SaveChangesAsync();
 
             return current;
         }
 
         public async Task<bool> DeleteAccount(int id)
         {
-            var current = await dataContext.Accounts.FindAsync(id);
+            var current = await _dataContext.Accounts.FindAsync(id);
             if (current == null)
             {
                 return false;
             }
 
-            dataContext.Accounts.Remove(current);
-            await dataContext.SaveChangesAsync();
+            _dataContext.Accounts.Remove(current);
+            await _dataContext.SaveChangesAsync();
 
             return true;
         }

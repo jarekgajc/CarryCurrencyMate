@@ -1,6 +1,7 @@
 ﻿using Backend.Models.User;
 using Common.Models.Account;
 using Microsoft.EntityFrameworkCore;
+using Common.Models.Observer;
 
 namespace Backend.Data
 {
@@ -19,5 +20,6 @@ namespace Backend.Data
 
         public DbSet<Account> Accounts { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Observer> Observers { get; set; } = default!;
     }
 }

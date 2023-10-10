@@ -25,10 +25,14 @@
 
 @code {
     public UserDto UserDto { get; set; } = new UserDto();
+    [CascadingParameter] private LoadRequest? LoadRequest { get; set; }
 
     public async void LogIn()
     {
-        HttpResponseMessage response = await HttpClient.PostAsJsonAsync($"{Env.Backend}/api/auth/login", UserDto);
+        HttpResponseMessage? response = await LoadRequest!(() => HttpClient.PostAsJsonAsync($"{Env.Backend}/api/auth/login", UserDto));
+        if (response == null)
+            return;
+
         string token = await response.Content.ReadAsStringAsync();
         if(!string.IsNullOrEmpty(token))
             authProvider.Authenticate(token);

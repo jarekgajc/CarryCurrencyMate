@@ -2,16 +2,19 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 
 namespace Frontend.Shared.Providers
 {
     public class AuthProvider : AuthenticationStateProvider
     {
         private readonly ILocalStorageService localStorage;
+        private readonly HttpClient httpClient;
 
-        public AuthProvider(ILocalStorageService localStorage)
+        public AuthProvider(ILocalStorageService localStorage, HttpClient httpClient)
         {
             this.localStorage = localStorage;
+            this.httpClient = httpClient;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -19,10 +22,12 @@ namespace Frontend.Shared.Providers
             string token = await localStorage.GetItemAsync<string>("token");
             if (string.IsNullOrEmpty(token))
             {
+                httpClient.DefaultRequestHeaders.Authorization = null;
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
             
             var jwtToken = new JwtSecurityToken(token);
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(jwtToken.Claims, "auth")));
         }
 

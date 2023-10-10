@@ -1,8 +1,12 @@
 using Backend.Data;
+using Backend.Models.Appsettings;
 using Backend.Services.AccountService;
+using Backend.Services.ObserverService;
 using Backend.Utils.Middleware;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +24,27 @@ builder.Services.AddSwaggerGen(options => {
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
-builder.Services.AddAuthentication().AddJwtBearer();
+
+builder.Services.AddAuthentication().AddJwtBearer(options =>
+{
+    var jwt = builder.Configuration.GetSection(nameof(Jwt)).Get<Jwt>();
+
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateIssuerSigningKey = true,
+        ValidateAudience = true,
+        ValidIssuer = jwt.Iss,
+        ValidAudience = jwt.Aud,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key)),
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IObserverService, ObserverService>();
 builder.Services.AddDbContext<DataContext>();
 
 //CORS

@@ -1,5 +1,8 @@
 ﻿using Backend.Data;
+using Backend.Models.Appsettings;
+using Backend.Models.Exception;
 using Backend.Models.User;
+using Common.Models.Error.Api;
 using Common.Models.User;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -44,7 +47,7 @@ public class AuthController : ControllerBase {
         User? user = dataContext.Users.FirstOrDefault(user => user.Email == userDto.Email);
         if(user == null || !BCrypt.Net.BCrypt.Verify(userDto.Password, user.PasswordHash))
         {
-            return BadRequest("Wrong credentials");
+            throw new ApiException(new CredentialsNotFound());
         }
 
         return CreateToken(user);
@@ -52,12 +55,17 @@ public class AuthController : ControllerBase {
 
     private string CreateToken(User user)
     {
+        var jwt = configuration.GetSection(nameof(Jwt)).Get<Jwt>();
+
         List<Claim> claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Email, user.Email)
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.Aud, jwt.Aud),
+            new Claim(JwtRegisteredClaimNames.Iss, jwt.Iss),
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("AppSettings:Token").Value!));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key));
 
         var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
@@ -67,8 +75,8 @@ public class AuthController : ControllerBase {
             signingCredentials: cred
         );
 
-        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+        var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-        return jwt;
+        return jwtToken;
     }
 }
