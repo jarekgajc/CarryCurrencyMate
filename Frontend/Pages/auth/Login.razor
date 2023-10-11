@@ -29,7 +29,7 @@
 
     public async void LogIn()
     {
-        HttpResponseMessage? response = await LoadRequest!(() => HttpClient.PostAsJsonAsync($"{Env.Backend}/api/auth/login", UserDto));
+        HttpResponseMessage? response = await LoadRequest!(() => HttpClient.PostAsJsonAsync("/api/auth/login", UserDto));
         if (response == null)
             return;
 

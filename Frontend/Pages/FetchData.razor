@@ -33,7 +33,7 @@ o
 
     protected override async Task OnInitializedAsync()
     {
-        var respone = await LoadRequest(() => Http.GetAsync($"{Env.Backend}/api/accounts"));
+        var respone = await LoadRequest(() => Http.GetAsync("/api/accounts"));
         if (respone != null)
         {
             forecasts = await respone.Content.ReadFromJsonAsync<Account[]>();

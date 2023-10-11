@@ -30,7 +30,7 @@
 
     public async void Register()
     {
-        HttpResponseMessage? response = await LoadRequest(() => HttpClient.PostAsJsonAsync($"{Env.Backend}/auth/register", UserDto));
+        HttpResponseMessage? response = await LoadRequest(() => HttpClient.PostAsJsonAsync("/auth/register", UserDto));
         if (response != null)
             GoToLogin();
     }

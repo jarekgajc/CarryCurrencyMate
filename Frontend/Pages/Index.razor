@@ -10,5 +10,8 @@
     [CascadingParameter]
     public Account Account { get; set; } = new Account();
 
-
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine(Account);
+    }
 }

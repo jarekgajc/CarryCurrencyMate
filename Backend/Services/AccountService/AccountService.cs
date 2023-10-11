@@ -25,10 +25,9 @@ namespace Backend.Services.AccountService
             return await _dataContext.Accounts.FindAsync(id);
         }
 
-        //TODO: store user id in Account
         public async Task<Account> GetUserAccount(int userId)
         {
-            Account? account = await _dataContext.Accounts.FindAsync(userId);
+            Account? account = await _dataContext.Accounts.Where(account => account.UserId == userId).FirstOrDefaultAsync();
             if(account == null)
             {
                 account = await CreateAccount(new Account
