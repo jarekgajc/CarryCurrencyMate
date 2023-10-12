@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Common.Models.Observer;
 
-public class Observer
+public class Observer : IIdHolder<long>
 {
     //TODO: should have connection to Account
     public long Id { get; set; }

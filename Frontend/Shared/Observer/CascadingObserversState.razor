@@ -1,0 +1,32 @@
+﻿@inject HttpClient _httpClient;
+
+<h3>ExchangeRateView</h3>
+
+@if (_observers != null)
+{
+    <CascadingValue Value="_observers">
+        @ChildContent
+    </CascadingValue>
+}
+
+@code {
+    private List<Observer>? _observers;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [CascadingParameter]
+    private LoadRequest? LoadRequest { get; set; }
+
+    public Observer? DefaultObserver => _observers?.FirstOrDefault();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        HttpResponseMessage? response = await LoadRequest!(() => _httpClient.GetAsync("/api/observers"));
+        if (response == null)
+            return;
+
+        _observers = await response.Content.ReadFromJsonAsync<List<Observer>>();
+    }
+}

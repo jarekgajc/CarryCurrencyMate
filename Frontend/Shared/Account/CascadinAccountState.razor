@@ -1,4 +1,4 @@
-﻿@inject HttpClient HttpClient;
+﻿@inject HttpClient _httpClient;
 
 @if(_account != null)
 {
@@ -18,7 +18,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        HttpResponseMessage? response = await LoadRequest!(() => HttpClient.GetAsync("/api/accounts/user"));
+        HttpResponseMessage? response = await LoadRequest!(() => _httpClient.GetAsync("/api/accounts/user"));
         if (response == null)
             return;
 

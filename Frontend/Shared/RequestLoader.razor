@@ -30,7 +30,7 @@
                 Loading = true;
                 await Task.Delay(1000);
                 HttpResponseMessage response = await load();
-                if(response.StatusCode == HttpStatusCode.OK)
+                if(response.IsSuccessStatusCode)
                 {
                     return response;
                 }

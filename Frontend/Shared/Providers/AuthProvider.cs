@@ -25,8 +25,14 @@ namespace Frontend.Shared.Providers
                 httpClient.DefaultRequestHeaders.Authorization = null;
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
-            
+
             var jwtToken = new JwtSecurityToken(token);
+            if (jwtToken.ValidTo < DateTime.UtcNow)
+            {
+                httpClient.DefaultRequestHeaders.Authorization = null;
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+            }
+
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(jwtToken.Claims, "auth")));
         }
