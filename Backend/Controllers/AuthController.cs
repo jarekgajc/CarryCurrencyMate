@@ -1,9 +1,9 @@
 ﻿using Backend.Data;
 using Backend.Models.Appsettings;
-using Backend.Models.Exception;
-using Backend.Models.User;
+using Backend.Models.Exceptions;
+using Backend.Models.Users;
 using Common.Models.Error.Api;
-using Common.Models.User;
+using Common.Models.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

@@ -1,0 +1,40 @@
+﻿<h3>ExchangeRateView</h3>
+
+@if (ObserversState.Default != null)
+{
+    @ChildContent
+}
+else
+{
+    <MudCard Outlined="true">
+    @if(_editorEnabled)
+    {
+        <ObserverEditor Observer="@ObserversState.Default" OnHide="ToggleEditorEnabled" OnSave=""/>
+    }
+    else
+    {
+        <MudCardContent>
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">You don't have any observation source specified. </MudAlert>
+        </MudCardContent>
+        <MudCardActions>
+            <MudSpacer/>
+            <MudButton Color="Color.Primary" @onclick="ToggleEditorEnabled">Create</MudButton>
+        </MudCardActions>
+    }
+    </MudCard>
+}
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [CascadingParameter]
+    public ObserversState ObserversState { get; set; }
+
+    private bool _editorEnabled;
+
+    private void ToggleEditorEnabled()
+    {
+        _editorEnabled = !_editorEnabled;
+    }
+}

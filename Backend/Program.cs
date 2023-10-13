@@ -1,7 +1,7 @@
 using Backend.Data;
 using Backend.Models.Appsettings;
-using Backend.Services.AccountService;
-using Backend.Services.ObserverService;
+using Backend.Services.AccountServices;
+using Backend.Services.ObserverServices;
 using Backend.Utils.Middleware;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;

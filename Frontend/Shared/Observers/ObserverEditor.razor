@@ -1,0 +1,55 @@
+﻿<MudCardHeader>
+    <CardHeaderContent>
+        <MudText Typo="Typo.h6">Observer</MudText>
+    </CardHeaderContent>
+</MudCardHeader>
+<MudCardContent>
+    <MudSelect T="string" Label="Coffee" AnchorOrigin="Origin.BottomCenter">
+        @foreach (ObservationSource observationSource in Enum.GetValues(typeof(ObservationSource)))
+        {
+            <MudSelectItem Value="@(observationSource.ToString())" />
+        }
+    </MudSelect>
+    TODO: add option to save an api key
+</MudCardContent>
+<MudCardActions>
+    <MudButton Variant="Variant.Text" Color="Color.Secondary" @onclick="Cancel">Cancel</MudButton>
+    <MudSpacer/>
+    <MudButton Variant="Variant.Text" Color="Color.Primary" @onclick="Save">Save</MudButton>
+</MudCardActions>
+
+@code {
+    [Parameter] public Observer? Observer { get; set; }
+    [Parameter] public Action OnHide { get; set; }
+    [Parameter] public Func<Observer, Task<bool>> OnSave { get; set; }
+
+    [CascadingParameter]
+    private LoadRequest? LoadRequest { get; set; }
+
+    private bool _exists;
+
+    protected override void OnInitialized()
+    {
+        if (Observer == null)
+        {
+            Observer = new Observer();
+        }
+        else
+        {
+            _exists = true;
+        }
+    }
+
+    public async void Save()
+    {
+        if(await OnSave(Observer!))
+        {
+            OnHide();
+        }
+    }
+
+    public void Cancel()
+    {
+        OnHide();
+    }
+}

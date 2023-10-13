@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using Backend.Models.Exception;
+using Backend.Models.Exceptions;
 
 namespace Backend.Utils.Middleware; 
 

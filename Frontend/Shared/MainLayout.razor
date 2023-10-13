@@ -1,4 +1,4 @@
-﻿@using Frontend.Shared.Account
+﻿@using Frontend.Shared.Accounts
 @inherits LayoutComponentBase
 
 <MudThemeProvider IsDarkMode="true"/>
@@ -36,7 +36,9 @@
                 <AuthorizeView>
                     <Authorized>
                         <CascadinAccountState>
-                            @Body
+                            <CascadingObserversState>
+                                @Body
+                            </CascadingObserversState>
                         </CascadinAccountState>
                     </Authorized>
                     <NotAuthorized>

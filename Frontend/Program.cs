@@ -14,11 +14,13 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddBlazoredLocalStorage();
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(Env.Backend) });
+builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(Env.Backend) });
 builder.Services.AddMudServices(config =>
 {
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
 });
+
+builder.Services.AddSingleton<ObjectsStateFactory>();
 
 builder.Services.AddScoped<AuthProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<AuthProvider>());

@@ -1,4 +1,4 @@
-﻿namespace Backend.Models.User; 
+﻿namespace Backend.Models.Users; 
 
 public class User {
     public int Id { get; set; }
