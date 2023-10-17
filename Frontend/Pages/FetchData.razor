@@ -28,7 +28,7 @@
 o
 
 @code {
-    private Account[]? forecasts;
+    private AccountDto[]? forecasts;
     [CascadingParameter] private LoadRequest LoadRequest { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -36,7 +36,7 @@ o
         var respone = await LoadRequest(() => Http.GetAsync("/api/accounts"));
         if (respone != null)
         {
-            forecasts = await respone.Content.ReadFromJsonAsync<Account[]>();
+            forecasts = await respone.Content.ReadFromJsonAsync<AccountDto[]>();
         }
     }
 }

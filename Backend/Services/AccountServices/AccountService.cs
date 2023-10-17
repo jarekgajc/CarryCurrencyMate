@@ -1,6 +1,6 @@
 ﻿using Backend.Data;
 using Backend.Models.Exceptions;
-using Common.Models.Account;
+using Common.Models.Accounts;
 using Common.Models.Error.Api;
 using Microsoft.EntityFrameworkCore;
 

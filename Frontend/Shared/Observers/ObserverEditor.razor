@@ -23,20 +23,20 @@
 }
 
 @code {
-    [Parameter] public Observer? Observer { get; set; }
+    [Parameter] public ObserverDto? Observer { get; set; }
     [Parameter, EditorRequired] public Action OnHide { get; set; }
-    [Parameter, EditorRequired] public SaveEditorState<Observer> OnSave { get; set; }
+    [Parameter, EditorRequired] public SaveEditorState<ObserverDto> OnSave { get; set; }
 
     public IObserverSource? _observerSource;
-    public EditorState<Observer>? _editorState;
-    public Observer Value => _editorState!.Value;
+    public EditorState<ObserverDto>? _editorState;
+    public ObserverDto Value => _editorState!.Value;
 
     [CascadingParameter]
     private LoadRequest? LoadRequest { get; set; }
 
     protected override void OnInitialized()
     {
-        _editorState = new EditorState<Observer>(Observer);
+        _editorState = new EditorState<ObserverDto>(Observer);
         OnChangeSource(Value.Source);
     }
 

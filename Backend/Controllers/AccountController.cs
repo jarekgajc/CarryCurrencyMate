@@ -1,6 +1,6 @@
 ﻿using Backend.Services.AccountServices;
 using Backend.Utils;
-using Common.Models.Account;
+using Common.Models.Accounts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

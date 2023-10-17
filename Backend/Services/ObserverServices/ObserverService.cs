@@ -1,5 +1,6 @@
 ﻿using Backend.Data;
 using Backend.Models.Exceptions;
+using Backend.Models.Observers;
 using Common.Models.Observers;
 using Common.Models.Error.Api;
 using Microsoft.EntityFrameworkCore;

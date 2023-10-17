@@ -8,7 +8,7 @@
 }
 
 @code {
-    private Account? _account;
+    private AccountDto? _account;
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }
@@ -22,6 +22,6 @@
         if (response == null)
             return;
 
-        _account = await response.Content.ReadFromJsonAsync<Account>();
+        _account = await response.Content.ReadFromJsonAsync<AccountDto>();
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Backend.Services.ObserverServices;
-using Common.Models.Observers;
+using Backend.Models.Observers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers

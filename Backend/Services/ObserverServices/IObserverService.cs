@@ -1,4 +1,4 @@
-﻿using Common.Models.Observers;
+﻿using Backend.Models.Observers;
 
 namespace Backend.Services.ObserverServices
 {

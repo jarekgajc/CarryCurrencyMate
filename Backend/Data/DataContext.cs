@@ -1,7 +1,7 @@
-﻿using Backend.Models.Users;
-using Common.Models.Account;
+﻿using Backend.Models.Observers;
+using Backend.Models.Users;
+using Common.Models.Accounts;
 using Microsoft.EntityFrameworkCore;
-using Common.Models.Observers;
 
 namespace Backend.Data
 {

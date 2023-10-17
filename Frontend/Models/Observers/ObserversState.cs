@@ -3,10 +3,10 @@ using Frontend.Utils.ObjectsStates;
 
 namespace Frontend.Models.Observers
 {
-    public class ObserversState : ObjectsState<Observer, long>
+    public class ObserversState : ObjectsState<ObserverDto, long>
     {
         protected override string BaseUrl => "api/observers";
 
-        public Observer? Default => Objects.FirstOrDefault();
+        public ObserverDto? Default => Objects.FirstOrDefault();
     }
 }
