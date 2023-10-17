@@ -29,8 +29,4 @@
     <_ContentIncludedByDefault Remove="wwwroot\css\app.css" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Shared\Sources\Auths\" />
-  </ItemGroup>
-
 </Project>

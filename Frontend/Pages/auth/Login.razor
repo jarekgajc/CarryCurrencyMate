@@ -35,7 +35,10 @@
 
         string token = await response.Content.ReadAsStringAsync();
         if(!string.IsNullOrEmpty(token))
+        {
             authProvider.Authenticate(token);
+            Navigation.NavigateTo("");
+        }
     }
 
     public void GoToRegistration()

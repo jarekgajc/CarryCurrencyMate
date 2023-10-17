@@ -1,10 +1,11 @@
 ﻿using Common.Models;
+using Frontend.Models;
 using Frontend.Models.RequestLoaders;
 using System.Net.Http.Json;
 
 namespace Frontend.Utils.ObjectsStates
 {
-    public abstract class ObjectsState<TObject, TId> : IRequestLoader where TObject : IIdHolder<TId>
+    public abstract class ObjectsState<TObject, TId> : IRequestLoader where TObject : class, IIdHolder<TId>, new()
     {
         private List<TObject>? _objects;
 
@@ -51,6 +52,18 @@ namespace Frontend.Utils.ObjectsStates
             if (response == null || bool.Parse(await response.Content.ReadAsStringAsync()))
                 return false;
             return true;
+        }
+
+        public async Task<bool> SaveEditorState(EditorState<TObject> editorState)
+        {
+            if (editorState.Exists)
+            {
+                return await UpdateObject(editorState.Value);
+            }
+            else
+            {
+                return await CreateObject(editorState.Value);
+            }
         }
 
     }

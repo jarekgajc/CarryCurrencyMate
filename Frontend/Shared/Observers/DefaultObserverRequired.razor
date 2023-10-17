@@ -1,37 +1,41 @@
 ﻿<h3>ExchangeRateView</h3>
 
-@if (ObserversState.Default != null)
+@if(ObserversState != null)
 {
-    @ChildContent
-}
-else
-{
-    <MudCard Outlined="true">
-    @if(_editorEnabled)
+    @if (ObserversState.Default != null)
     {
-        <ObserverEditor Observer="@ObserversState.Default" OnHide="ToggleEditorEnabled" OnSave=""/>
+        @ChildContent
     }
     else
     {
-        <MudCardContent>
-            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">You don't have any observation source specified. </MudAlert>
-        </MudCardContent>
-        <MudCardActions>
-            <MudSpacer/>
-            <MudButton Color="Color.Primary" @onclick="ToggleEditorEnabled">Create</MudButton>
-        </MudCardActions>
+        <MudCard Outlined="true">
+        @if(_editorEnabled)
+        {
+            <ObserverEditor Observer="@ObserversState.Default" OnHide="ToggleEditorEnabled" OnSave="@ObserversState.SaveEditorState" />
+        }
+        else
+        {
+            <MudCardContent>
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">You don't have any observation source specified. </MudAlert>
+            </MudCardContent>
+            <MudCardActions>
+                <MudSpacer/>
+                <MudButton Color="Color.Primary" @onclick="ToggleEditorEnabled">Create</MudButton>
+            </MudCardActions>
+        }
+        </MudCard>
     }
-    </MudCard>
 }
 
 @code {
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public RenderFragment? ChildContent { get; set; }
 
     [CascadingParameter]
-    public ObserversState ObserversState { get; set; }
+    public ObserversState? ObserversState { get; set; }
 
-    private bool _editorEnabled;
+    //TODO: Restore
+    private bool _editorEnabled = true;
 
     private void ToggleEditorEnabled()
     {

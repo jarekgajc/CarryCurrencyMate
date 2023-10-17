@@ -1,48 +1,53 @@
-﻿<MudCardHeader>
+﻿@using Common.Models.Observers.Sources;
+<MudCardHeader>
     <CardHeaderContent>
         <MudText Typo="Typo.h6">Observer</MudText>
     </CardHeaderContent>
 </MudCardHeader>
-<MudCardContent>
-    <MudSelect T="string" Label="Coffee" AnchorOrigin="Origin.BottomCenter">
-        @foreach (ObservationSource observationSource in Enum.GetValues(typeof(ObservationSource)))
-        {
-            <MudSelectItem Value="@(observationSource.ToString())" />
-        }
-    </MudSelect>
-    TODO: add option to save an api key
-</MudCardContent>
-<MudCardActions>
-    <MudButton Variant="Variant.Text" Color="Color.Secondary" @onclick="Cancel">Cancel</MudButton>
-    <MudSpacer/>
-    <MudButton Variant="Variant.Text" Color="Color.Primary" @onclick="Save">Save</MudButton>
-</MudCardActions>
+@if (_editorState != null && _observerSource != null)
+{
+    <MudCardContent>
+        <MudSelect T="ObservationSource" Value="Value.Source" ValueChanged="OnChangeSource" Label="Source" AnchorOrigin="Origin.BottomCenter">
+            @foreach (ObservationSource observationSource in Enum.GetValues(typeof(ObservationSource)))
+            {
+                <MudSelectItem Value="@observationSource"/>
+            }
+        </MudSelect>
+        <SourceAuthEditor Type="@_observerSource.SourceAuthType" Holder="@Value" />
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton Variant="Variant.Text" Color="Color.Secondary" @onclick="Cancel">Cancel</MudButton>
+        <MudSpacer/>
+        <MudButton Variant="Variant.Text" Color="Color.Primary" @onclick="Save">Save</MudButton>
+    </MudCardActions>
+}
 
 @code {
     [Parameter] public Observer? Observer { get; set; }
-    [Parameter] public Action OnHide { get; set; }
-    [Parameter] public Func<Observer, Task<bool>> OnSave { get; set; }
+    [Parameter, EditorRequired] public Action OnHide { get; set; }
+    [Parameter, EditorRequired] public SaveEditorState<Observer> OnSave { get; set; }
+
+    public IObserverSource? _observerSource;
+    public EditorState<Observer>? _editorState;
+    public Observer Value => _editorState!.Value;
 
     [CascadingParameter]
     private LoadRequest? LoadRequest { get; set; }
 
-    private bool _exists;
-
     protected override void OnInitialized()
     {
-        if (Observer == null)
-        {
-            Observer = new Observer();
-        }
-        else
-        {
-            _exists = true;
-        }
+        _editorState = new EditorState<Observer>(Observer);
+        OnChangeSource(Value.Source);
+    }
+
+    private void OnChangeSource(ObservationSource observationSource)
+    {
+        _observerSource = IObserverSource.GetInstance(observationSource);
     }
 
     public async void Save()
     {
-        if(await OnSave(Observer!))
+        if(await OnSave(_editorState!))
         {
             OnHide();
         }

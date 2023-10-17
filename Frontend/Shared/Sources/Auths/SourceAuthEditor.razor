@@ -1,0 +1,11 @@
+﻿@using Common.Models.Sources.Auths;
+
+@if (Holder != null)
+{
+    <MudTextField @bind-Value="Holder.SourceAuth.ApiKey" Label="API key" Variant="Variant.Text"/>
+}
+
+@code {
+    [Parameter] public SourceAuthType Type { get; set; }
+    [Parameter] public ISourceAuthHolder? Holder { get; set; }
+}

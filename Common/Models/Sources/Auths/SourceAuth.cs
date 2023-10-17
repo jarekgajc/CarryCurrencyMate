@@ -9,6 +9,7 @@ namespace Common.Models.Sources.Auths
     public class SourceAuth
     {
         public long Id { get; set; }
+        //TODO: encrypt it
         public string? ApiKey { get; set; }
     }
 }

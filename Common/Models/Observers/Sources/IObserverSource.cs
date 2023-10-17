@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common.Models.Sources.Auths;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,8 @@ namespace Common.Models.Observers.Sources
 {
     public interface IObserverSource
     {
+        SourceAuthType SourceAuthType { get; }
+
         public static IObserverSource GetInstance(ObservationSource source)
         {
             return source switch

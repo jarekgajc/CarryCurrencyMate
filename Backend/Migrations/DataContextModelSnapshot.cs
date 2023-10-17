@@ -21,7 +21,7 @@ namespace Backend.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Backend.Models.User.User", b =>
+            modelBuilder.Entity("Backend.Models.Users.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -58,7 +58,7 @@ namespace Backend.Migrations
                     b.ToTable("Accounts");
                 });
 
-            modelBuilder.Entity("Common.Models.Observer.Observer", b =>
+            modelBuilder.Entity("Common.Models.Observers.Observer", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -69,9 +69,41 @@ namespace Backend.Migrations
                     b.Property<int>("Source")
                         .HasColumnType("int");
 
+                    b.Property<long>("SourceAuthId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("SourceAuthId");
+
                     b.ToTable("Observers");
+                });
+
+            modelBuilder.Entity("Common.Models.Sources.Auths.SourceAuth", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ApiKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SourceAuth");
+                });
+
+            modelBuilder.Entity("Common.Models.Observers.Observer", b =>
+                {
+                    b.HasOne("Common.Models.Sources.Auths.SourceAuth", "SourceAuth")
+                        .WithMany()
+                        .HasForeignKey("SourceAuthId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SourceAuth");
                 });
 #pragma warning restore 612, 618
         }
