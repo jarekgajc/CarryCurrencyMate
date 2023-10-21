@@ -1,6 +1,7 @@
 ﻿using Backend.Services.ObserverServices;
 using Backend.Models.Observers;
 using Microsoft.AspNetCore.Mvc;
+using Backend.Utils;
 
 namespace Backend.Controllers
 {
@@ -18,25 +19,25 @@ namespace Backend.Controllers
         [HttpGet]
         public async Task<List<Observer>> GetObservers()
         {
-            return await _observerService.GetObservers();
+            return await _observerService.GetObservers(User.GetAccountId());
         }
 
         [HttpPost]
         public async Task<Observer> CreateObserver(Observer observer)
         {
-            return await _observerService.CreateObserver(observer);
+            return await _observerService.CreateObserver(User.GetAccountId(), observer);
         }
 
         [HttpPut("{id}")]
         public async Task<Observer> UpdateObserver(long id, Observer observer)
         {
-            return await _observerService.UpdateObserver(id, observer);
+            return await _observerService.UpdateObserver(User.GetAccountId(), id, observer);
         }
 
         [HttpDelete("{id}")]
         public async Task<bool> DeleteObserver(long id)
         {
-            return await _observerService.DeleteObserver(id);
+            return await _observerService.DeleteObserver(User.GetAccountId(), id);
         }
     }
 }

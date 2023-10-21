@@ -1,8 +1,10 @@
 ﻿using Backend.Data;
+using Backend.Models.Accounts;
 using Backend.Models.Exceptions;
-using Common.Models.Accounts;
+using Backend.Models.Users;
 using Common.Models.Error.Api;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 
 namespace Backend.Services.AccountServices
 {
@@ -20,21 +22,24 @@ namespace Backend.Services.AccountServices
             return await _dataContext.Accounts.ToListAsync();
         }
 
-        public async Task<Account?> GetAccount(int id)
+        public async Task<Account> GetAccount(int id)
         {
-            return await _dataContext.Accounts.FindAsync(id);
+            return await _dataContext.Accounts.FindAsync(id) ?? throw new ApiException(new ResourceDoesNotExist());
         }
 
-        public async Task<Account> GetUserAccount(int userId)
+        public async Task<Account> GetAccountIncludeObservers(int id)
         {
-            Account? account = await _dataContext.Accounts.Where(account => account.UserId == userId).FirstOrDefaultAsync();
-            if(account == null)
-            {
-                account = await CreateAccount(new Account
+            return await _dataContext.Accounts.Where(account => account.Id == id).Include(account => account.Observers).FirstOrDefaultAsync() ?? throw new ApiException(new ResourceDoesNotExist());
+        }
+
+        public async Task<Account> GetOrCreateUserAccount(User user)
+        {
+            Account? account = await _dataContext.Accounts.Where(account => account.User.Id == user.Id).FirstOrDefaultAsync();
+            account ??= await CreateAccount(new Account
                 {
-                    UserId = userId
+                    User = user,
+                    Observers = new List<Models.Observers.Observer>()
                 });
-            }
             return account;
         }
 

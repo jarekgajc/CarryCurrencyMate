@@ -1,7 +1,9 @@
-﻿using Backend.Data;
+﻿using Backend.Models.Accounts;
 using Backend.Models.Appsettings;
 using Backend.Models.Exceptions;
 using Backend.Models.Users;
+using Backend.Services.AccountServices;
+using Backend.Services.UserServices;
 using Common.Models.Error.Api;
 using Common.Models.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -15,13 +17,15 @@ namespace Backend.Controllers;
 [Route("api/auth")]
 [ApiController]
 public class AuthController : ControllerBase {
-    private readonly IConfiguration configuration;
-    private readonly DataContext dataContext;
+    private readonly IConfiguration _configuration;
+    private readonly IUserService _userService;
+    private readonly IAccountService _accountService;
 
-    public AuthController(IConfiguration configuration, DataContext dataContext)
+    public AuthController(IConfiguration configuration, IUserService userService, IAccountService accountService)
     {
-        this.configuration = configuration;
-        this.dataContext = dataContext;
+        _configuration = configuration;
+        _userService = userService;
+        _accountService = accountService;
     }
 
     [HttpPost("register")]
@@ -35,27 +39,26 @@ public class AuthController : ControllerBase {
             PasswordHash = passwordHash
         };
 
-        dataContext.Users.Add(user);
-        await dataContext.SaveChangesAsync();
+        await _userService.CreateUser(user);
 
         return user;
     }
 
     [HttpPost("login")]
-    public ActionResult<string> Login(UserDto userDto)
+    public async Task<string> Login(UserDto userDto)
     {
-        User? user = dataContext.Users.FirstOrDefault(user => user.Email == userDto.Email);
+        User? user = await _userService.GetUserByEmail(userDto.Email);
         if(user == null || !BCrypt.Net.BCrypt.Verify(userDto.Password, user.PasswordHash))
         {
             throw new ApiException(new CredentialsNotFound());
         }
 
-        return CreateToken(user);
+        return await CreateToken(user);
     }
 
-    private string CreateToken(User user)
+    private async Task<string> CreateToken(User user)
     {
-        var jwt = configuration.GetSection(nameof(Jwt)).Get<Jwt>();
+        var jwt = _configuration.GetSection(nameof(Jwt)).Get<Jwt>();
 
         List<Claim> claims = new List<Claim>
         {
@@ -63,6 +66,7 @@ public class AuthController : ControllerBase {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Aud, jwt.Aud),
             new Claim(JwtRegisteredClaimNames.Iss, jwt.Iss),
+            new Claim("accountId", (await _accountService.GetOrCreateUserAccount(user)).Id.ToString())
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key));

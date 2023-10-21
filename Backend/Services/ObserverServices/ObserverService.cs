@@ -1,7 +1,8 @@
 ﻿using Backend.Data;
+using Backend.Models.Accounts;
 using Backend.Models.Exceptions;
 using Backend.Models.Observers;
-using Common.Models.Observers;
+using Backend.Services.AccountServices;
 using Common.Models.Error.Api;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,45 +11,51 @@ namespace Backend.Services.ObserverServices
     public class ObserverService : IObserverService
     {
         private readonly DataContext _dataContext;
+        private readonly IAccountService _accountService;
 
-        public ObserverService(DataContext dataContext)
+        public ObserverService(DataContext dataContext, IAccountService accountService)
         {
             _dataContext = dataContext;
+            _accountService = accountService;
         }
 
-        public async Task<List<Observer>> GetObservers()
+        public async Task<List<Observer>> GetObservers(int accountId)
         {
-            return await _dataContext.Observers.ToListAsync();
+            Account account = await _accountService.GetAccountIncludeObservers(accountId);
+            return account.Observers;
         }
 
-        public async Task<Observer?> GetObserver(long id)
+        public async Task<Observer?> GetObserver(int accountId, long id)
         {
-            return await _dataContext.Observers.FindAsync(id);
+            Account account = await _accountService.GetAccountIncludeObservers(accountId);
+            return account.Observers.Find(observer => id == observer.Id);
         }
 
-        public async Task<Observer> CreateObserver(Observer observer)
+        public async Task<Observer> CreateObserver(int accountId, Observer observer)
         {
-            _dataContext.Observers.Add(observer);
+            Account account = await _accountService.GetAccountIncludeObservers(accountId);
+            account.Observers.Add(observer);
             await _dataContext.SaveChangesAsync();
 
             return observer;
         }
 
-        public async Task<Observer> UpdateObserver(long id, Observer observer)
+        public async Task<Observer> UpdateObserver(int accountId, long id, Observer observer)
         {
             if (id != observer.Id)
             {
                 throw new ApiException(new ResourceDoesNotExist());
             }
-            var current = await _dataContext.Observers.FindAsync(id) ?? throw new ApiException(new ResourceDoesNotExist());
+            Observer current = (await GetObserver(accountId, id)) ?? throw new ApiException(new ResourceDoesNotExist());
+            _dataContext.Entry(current).CurrentValues.SetValues(observer);
             await _dataContext.SaveChangesAsync();
 
             return current;
         }
 
-        public async Task<bool> DeleteObserver(long id)
+        public async Task<bool> DeleteObserver(int accountId, long id)
         {
-            var current = await _dataContext.Observers.FindAsync(id);
+            Observer? current = (await GetObserver(accountId, id));
             if (current == null)
             {
                 return false;

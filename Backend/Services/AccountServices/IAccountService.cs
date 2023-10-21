@@ -1,14 +1,12 @@
-﻿using Common.Models.Accounts;
+﻿using Backend.Models.Accounts;
+using Backend.Models.Users;
 
 namespace Backend.Services.AccountServices
 {
     public interface IAccountService
     {
-        Task<List<Account>> GetAccounts();
-        Task<Account?> GetAccount(int id);
-        Task<Account> CreateAccount(Account account);
-        Task<Account> UpdateAccount(int id, Account account);
-        Task<bool> DeleteAccount(int id);
-        Task<Account> GetUserAccount(int userId);
+        Task<Account> GetAccount(int id);
+        Task<Account> GetAccountIncludeObservers(int id);
+        Task<Account> GetOrCreateUserAccount(User user);
     }
 }

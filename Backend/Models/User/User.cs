@@ -1,7 +1,11 @@
-﻿namespace Backend.Models.Users; 
+﻿
+using Backend.Models.Accounts;
 
-public class User {
+namespace Backend.Models.Users;
+
+public class User
+{
     public int Id { get; set; }
-    public string Email { get; set; } = string.Empty;
-    public string PasswordHash { get; set; } = string.Empty;
+    public required string Email { get; set; }
+    public required string PasswordHash { get; set; }
 }

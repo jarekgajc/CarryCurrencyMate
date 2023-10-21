@@ -2,6 +2,7 @@ using Backend.Data;
 using Backend.Models.Appsettings;
 using Backend.Services.AccountServices;
 using Backend.Services.ObserverServices;
+using Backend.Services.UserServices;
 using Backend.Utils.Middleware;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -43,6 +44,7 @@ builder.Services.AddAuthentication().AddJwtBearer(options =>
     };
 });
 
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IObserverService, ObserverService>();
 builder.Services.AddDbContext<DataContext>();

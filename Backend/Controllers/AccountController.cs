@@ -1,6 +1,6 @@
-﻿using Backend.Services.AccountServices;
+﻿using Backend.Models.Accounts;
+using Backend.Services.AccountServices;
 using Backend.Utils;
-using Common.Models.Accounts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,34 +18,10 @@ namespace Backend.Controllers
             _accountService = accountService;
         }
 
-        [HttpGet]
-        public async Task<List<Account>> GetAccounts()
+        [HttpGet("")]
+        public async Task<Account> GetAccount()
         {
-            return await _accountService.GetAccounts();
-        }
-
-        [HttpGet("user")]
-        public async Task<Account> GetUserAccount()
-        {
-            return await _accountService.GetUserAccount(User.GetUserId());
-        }
-
-        [HttpPost]
-        public async Task<Account> CreateAccount(Account account)
-        {
-            return await _accountService.CreateAccount(account);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<Account> UpdateAccount(int id, Account account)
-        {
-            return await _accountService.UpdateAccount(id, account);
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<bool> DeleteAccount(int id)
-        {
-            return await _accountService.DeleteAccount(id);
+            return await _accountService.GetAccount(User.GetAccountId());
         }
     }
 }
