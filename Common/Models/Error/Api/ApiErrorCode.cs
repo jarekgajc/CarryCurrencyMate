@@ -2,5 +2,6 @@
 
 public enum ApiErrorCode {
     CredentialsNotFound,
-    ItemDoesNotExist
+    ItemDoesNotExist,
+    ConnectionToSourceFailed
 }

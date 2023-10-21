@@ -2,9 +2,11 @@
 using Backend.Models.Observers;
 using Microsoft.AspNetCore.Mvc;
 using Backend.Utils;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers
 {
+    [Authorize]
     [Route("api/observers")]
     [ApiController]
     public class ObserverController : ControllerBase
