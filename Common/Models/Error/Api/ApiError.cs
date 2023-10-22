@@ -1,8 +1,8 @@
 ﻿namespace Common.Models.Error.Api; 
 
 public class ApiError {
-    public ApiErrorCode Code { get; }
-    public string? Data { get; protected set; }
+    public ApiErrorCode Code { get; set; }
+    public string? Data { get; set; }
 
     public ApiError()
     {

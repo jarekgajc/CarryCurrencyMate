@@ -13,12 +13,28 @@ namespace Backend.Models.Sources.Auths
         //TODO: encrypt it
         public string? ApiKey { get; set; }
 
+        internal void Update(SourceAuth other)
+        {
+            ApiKey = other.ApiKey;
+        }
+
+        internal static SourceAuth FromDto(SourceAuthDto dto)
+        {
+            return new SourceAuth
+            {
+                Id = dto.Id,
+                ApiKey = dto.ApiKey
+            };
+        }
+
         public SourceAuthDto ToDto() 
         {
             return new SourceAuthDto 
             {
+                Id = Id,
                 ApiKey = ApiKey
             };
         }
+
     }
 }

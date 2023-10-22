@@ -4,7 +4,6 @@ using Backend.Models.Exceptions;
 using Backend.Models.Observers;
 using Backend.Services.AccountServices;
 using Common.Models.Error.Api;
-using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services.ObserverServices
 {
@@ -46,8 +45,21 @@ namespace Backend.Services.ObserverServices
             {
                 throw new ApiException(new ResourceDoesNotExist());
             }
+
             Observer current = (await GetObserver(accountId, id)) ?? throw new ApiException(new ResourceDoesNotExist());
-            _dataContext.Entry(current).CurrentValues.SetValues(observer);
+            
+            if (current.SourceAuth.Id != observer.SourceAuth.Id)
+            {
+                throw new ApiException(new ResourceDoesNotExist());
+            }
+            //observer.Id = current.Id;
+            //_dataContext.Entry(observer).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+
+
+            //current.SourceAuth.ApiKey = observer.SourceAuth.ApiKey;
+            current.Update(observer);
+            //_dataContext.Entry(current).CurrentValues.SetValues(observer);
+            //_dataContext.SourceAuths.Entry(current.SourceAuth).CurrentValues.SetValues(observer.SourceAuth);
             await _dataContext.SaveChangesAsync();
 
             return current;

@@ -2,4 +2,5 @@
 
 public class SourceAuthDto {
     public string? ApiKey { get; set; }
+    public long Id { get; set; }
 }

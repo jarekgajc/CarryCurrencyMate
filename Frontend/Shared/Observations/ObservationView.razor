@@ -1,5 +1,81 @@
-﻿<h3>ExchangeRateView</h3>
+﻿@using Common.Models.Observations;
+@inject HttpClient HttpClient;
+
+@if(_observation != null)
+{
+    <h1>Base currency: @_observation.BaseCurrency</h1>
+}
+else if(_showEditObserverTip)
+{
+    @if(_showObserverEditor)
+    {
+        <ObserverEditor Observer="ObserversState.Default" OnHide="ToggleObserverEditor" OnSave="OnSave"/>
+    }
+    else
+    {
+        <MudText>Exchange rates could not be loaded. <MudLink @onclick="ToggleObserverEditor">Check your credentials.</MudLink></MudText>
+    }
+}
 
 @code {
+    private Observation? _observation;
+    private ObservationQuery _query = null!;
+    private bool _showEditObserverTip;
+    private bool _showObserverEditor;
 
+    [CascadingParameter]
+    public ObserversState ObserversState { get; set; } = null!;
+
+    [CascadingParameter]
+    private LoadRequest LoadRequest { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _query = new ObservationQuery
+            {
+                BaseCurrency = Currency.EUR,
+                Currencies = new List<Currency> { Currency.PLN, Currency.USD },
+                Observer = ObserversState.Default!,
+                TimeRange = TimeRange.DAY
+            };
+
+        await LoadObservation();
+    }
+
+    public async Task LoadObservation()
+    {
+        HttpResponseMessage? response = await LoadRequest!(() => HttpClient.GetAsync($"/api/observations?q={Base64Utils.FromObject(_query)}"), OnFail);
+        if (response == null)
+            return;
+
+        _observation = await response.Content.ReadFromJsonAsync<Observation>();
+    }
+
+    //TODO: dont load observations before quiting the editor
+    public async Task<bool> OnSave(EditorState<ObserverDto> editorState)
+    {
+        if(await ObserversState.SaveEditorState(editorState))
+        {
+            LoadObservation();
+            return true;
+        }
+        return false;
+    }
+
+    public void OnFail(ApiError apiError)
+    {
+        if(apiError.Code == ApiErrorCode.ConnectionToSourceFailed)
+        {
+            _showEditObserverTip = true;
+        }
+    }
+
+    public void ToggleObserverEditor()
+    {
+        _showObserverEditor = !_showObserverEditor;
+        if(!_showObserverEditor)
+        {
+            _showEditObserverTip = false;
+        }
+    }
 }

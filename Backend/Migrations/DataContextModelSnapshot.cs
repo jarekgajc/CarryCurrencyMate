@@ -79,7 +79,7 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SourceAuth");
+                    b.ToTable("SourceAuths");
                 });
 
             modelBuilder.Entity("Backend.Models.Users.User", b =>
@@ -116,7 +116,7 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Observers.Observer", b =>
                 {
-                    b.HasOne("Backend.Models.Accounts.Account", "Account")
+                    b.HasOne("Backend.Models.Accounts.Account", null)
                         .WithMany("Observers")
                         .HasForeignKey("AccountId");
 
@@ -125,8 +125,6 @@ namespace Backend.Migrations
                         .HasForeignKey("SourceAuthId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Account");
 
                     b.Navigation("SourceAuth");
                 });

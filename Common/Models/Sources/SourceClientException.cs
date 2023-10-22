@@ -9,6 +9,12 @@ namespace Common.Models.Sources
 {
     public class SourceClientException : Exception
     {
+        public List<string>? Errors { get; set; }
+
+        public SourceClientException(List<string>? errors)
+        {
+            Errors = errors;
+        }
 
         public SourceClientException() {}
 
@@ -18,6 +24,10 @@ namespace Common.Models.Sources
 
         public ApiError ToApiError()
         {
+            if(Errors != null)
+            {
+                return new SourceErrorThrown(Errors);
+            }
             return new ConnectionToSourceFailed();
         }
     }

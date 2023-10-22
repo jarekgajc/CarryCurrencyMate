@@ -24,7 +24,8 @@ namespace Common.Models.Observers.Sources
         {
             return source switch
             {
-                ObservationSource.Walutomat => new Walutomat(),
+                ObservationSource.WalutomatDev => new Walutomat(true),
+                ObservationSource.Walutomat => new Walutomat(false),
                 _ => throw new NotImplementedException(),
             };
         }

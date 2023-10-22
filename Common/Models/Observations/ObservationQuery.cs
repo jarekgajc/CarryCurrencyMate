@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Common.Models.Observations
 {
+    //TODO: somehow send it using "GET"
     public class ObservationQuery
     {
         public required Currency BaseCurrency { get; set; }

@@ -1,3 +1,5 @@
-﻿namespace Frontend.Models.RequestLoaders; 
+﻿using Common.Models.Error.Api;
 
-public delegate Task<HttpResponseMessage?> LoadRequest(Func<Task<HttpResponseMessage>> load);
+namespace Frontend.Models.RequestLoaders; 
+
+public delegate Task<HttpResponseMessage?> LoadRequest(Func<Task<HttpResponseMessage>> load, Action<ApiError>? onFail = null);

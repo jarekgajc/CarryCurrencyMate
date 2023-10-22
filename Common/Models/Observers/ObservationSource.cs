@@ -8,6 +8,6 @@ namespace Common.Models.Observers
 {
     public enum ObservationSource
     {
-        Walutomat
+        WalutomatDev, Walutomat
     }
 }

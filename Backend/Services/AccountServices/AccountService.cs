@@ -29,7 +29,11 @@ namespace Backend.Services.AccountServices
 
         public async Task<Account> GetAccountIncludeObservers(int id)
         {
-            return await _dataContext.Accounts.Where(account => account.Id == id).Include(account => account.Observers).FirstOrDefaultAsync() ?? throw new ApiException(new ResourceDoesNotExist());
+            return await _dataContext.Accounts
+                .Where(account => account.Id == id)
+                .Include(account => account.Observers)
+                    .ThenInclude(observer => observer.SourceAuth)
+                .FirstOrDefaultAsync() ?? throw new ApiException(new ResourceDoesNotExist());
         }
 
         public async Task<Account> GetOrCreateUserAccount(User user)

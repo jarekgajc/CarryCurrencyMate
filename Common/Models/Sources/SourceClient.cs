@@ -14,7 +14,7 @@ namespace Common.Models.Sources
 
         public void SetHeaderAuthorization(string key, string value)
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(key, value);
+            _httpClient.DefaultRequestHeaders.Add(key, value);
         }
 
         public async Task<T> Get<T>(string requestUri)

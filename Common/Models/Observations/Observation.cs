@@ -17,13 +17,13 @@ namespace Common.Models.Observations
         public Currency Currency { get; set; }
         public required List<ExchangeRateValue> Values { get; set; }
     }
-
+    
     public class ExchangeRateValue
     {
         public decimal Avg { get; set; }
         public decimal Buy { get; set; }
         public decimal Sell { get; set; }
-        public DateTime Time { get; set; }
+        public required DateTime Time { get; set; }
     }
 
     public enum Currency

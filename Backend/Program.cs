@@ -1,13 +1,18 @@
 using Backend.Data;
 using Backend.Models.Appsettings;
 using Backend.Services.AccountServices;
+using Backend.Services.ObservationServices;
 using Backend.Services.ObserverServices;
 using Backend.Services.UserServices;
 using Backend.Utils.Middleware;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using System.Globalization;
 using System.Text;
+
+CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +52,7 @@ builder.Services.AddAuthentication().AddJwtBearer(options =>
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IObserverService, ObserverService>();
+builder.Services.AddScoped<IObservationService, ObservationService>();
 builder.Services.AddDbContext<DataContext>();
 
 //CORS

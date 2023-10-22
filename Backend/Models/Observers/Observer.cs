@@ -10,6 +10,22 @@ public class Observer
     public required ObservationSource Source { get; set; }
     public required SourceAuth SourceAuth { get; set; }
 
+    public void Update(Observer other)
+    {
+        Source = other.Source;
+        SourceAuth.Update(other.SourceAuth);
+    }
+
+    public static Observer FromDto(ObserverDto dto)
+    {
+        return new Observer
+        {
+            Id = dto.Id,
+            Source = dto.Source,
+            SourceAuth = SourceAuth.FromDto(dto.SourceAuth)
+        };
+    }
+
     public ObserverDto ToDto() {
         return new ObserverDto
         {
