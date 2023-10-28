@@ -50,7 +50,7 @@ builder.Services.AddAuthentication().AddJwtBearer(options =>
 });
 
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountService, AccountPreferenceService>();
 builder.Services.AddScoped<IObserverService, ObserverService>();
 builder.Services.AddScoped<IObservationService, ObservationService>();
 builder.Services.AddDbContext<DataContext>();

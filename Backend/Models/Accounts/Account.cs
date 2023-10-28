@@ -10,11 +10,12 @@ namespace Backend.Models.Accounts
 
         public required User User { get; set; }
         public required List<Observer> Observers { get; set; }
+        public AccountPreference? Preference { get; set; }
 
         public AccountDto ToDto() {
             return new AccountDto
             {
-                Id = Id
+                Id = Id,
             };
         }
     }

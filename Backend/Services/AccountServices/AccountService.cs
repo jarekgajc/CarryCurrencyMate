@@ -4,7 +4,6 @@ using Backend.Models.Exceptions;
 using Backend.Models.Users;
 using Common.Models.Error.Api;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 
 namespace Backend.Services.AccountServices
 {
@@ -65,20 +64,6 @@ namespace Backend.Services.AccountServices
             await _dataContext.SaveChangesAsync();
 
             return current;
-        }
-
-        public async Task<bool> DeleteAccount(int id)
-        {
-            var current = await _dataContext.Accounts.FindAsync(id);
-            if (current == null)
-            {
-                return false;
-            }
-
-            _dataContext.Accounts.Remove(current);
-            await _dataContext.SaveChangesAsync();
-
-            return true;
         }
         
     }

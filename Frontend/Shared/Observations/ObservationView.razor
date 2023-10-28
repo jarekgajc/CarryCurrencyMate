@@ -4,6 +4,23 @@
 @if(_observation != null)
 {
     <h1>Base currency: @_observation.BaseCurrency</h1>
+    <MudTable Items="@_observationTableData.Rows" Hover="true" Breakpoint="Breakpoint.Sm">
+        <ColGroup>
+            <col/>
+            <col style="width: 80px;"/>
+            <col style="width: 80px;"/>
+        </ColGroup>
+        <HeaderContent>
+            <MudTh>Currency</MudTh>
+            <MudTh>Buy</MudTh>
+            <MudTh>Sell</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Currency">@context.Currency</MudTd>
+            <MudTd DataLabel="Buy">@context.Buy</MudTd>
+            <MudTd DataLabel="Sell">@context.Sell</MudTd>
+        </RowTemplate>
+    </MudTable>
 }
 else if(_showEditObserverTip)
 {
@@ -19,6 +36,7 @@ else if(_showEditObserverTip)
 
 @code {
     private Observation? _observation;
+    private ObservationTableData _observationTableData = null!;
     private ObservationQuery _query = null!;
     private bool _showEditObserverTip;
     private bool _showObserverEditor;
@@ -49,6 +67,8 @@ else if(_showEditObserverTip)
             return;
 
         _observation = await response.Content.ReadFromJsonAsync<Observation>();
+        if(_observation != null)
+            _observationTableData = new ObservationTableData(_observation);
     }
 
     //TODO: dont load observations before quiting the editor

@@ -18,6 +18,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+        //Update db
+        //Wait for all
+        //Action to EventCallback
         HttpResponseMessage? response = await LoadRequest!(() => HttpClient.GetAsync("/api/accounts"));
         if (response == null)
             return;

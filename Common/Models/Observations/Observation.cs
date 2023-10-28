@@ -26,6 +26,27 @@ namespace Common.Models.Observations
         public required DateTime Time { get; set; }
     }
 
+    public class ObservationTableData
+    {
+        public Row[] Rows { get; set; }
+        public ObservationTableData(Observation observation) {
+            Rows = observation.ExchangeRates
+                .SelectMany(exchangeRate => exchangeRate.Values.Select(value => new Row
+                {
+                    Currency = exchangeRate.Currency,
+                    Buy = value.Buy,
+                    Sell = value.Sell
+                })).ToArray();
+        }
+
+        public class Row
+        {
+            public required Currency Currency { get; set; }
+            public required decimal Buy { get; set; }
+            public required decimal Sell { get; set; }
+        }
+    }
+
     public enum Currency
     {
         USD, EUR, PLN

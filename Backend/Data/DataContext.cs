@@ -20,6 +20,7 @@ namespace Backend.Data
         }
 
         public DbSet<Account> Accounts { get; set; }
+        public DbSet<AccountPreference> AccountPreferences { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Observer> Observers { get; set; }
         public DbSet<SourceAuth> SourceAuths { get; set; }
