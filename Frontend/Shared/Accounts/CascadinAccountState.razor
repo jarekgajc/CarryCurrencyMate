@@ -1,30 +1,30 @@
 ﻿@inject HttpClient HttpClient;
+@inject ObjectsStateFactory ObjectsStateFactory;
 
-@if(_account != null)
+@if (_accountState.Valid && _accountPreferenceState.Valid)
 {
-    <CascadingValue Value="_account">
-        @ChildContent
+    <CascadingValue Value="_accountState">
+        <CascadingValue Value="_accountPreferenceState">
+            @ChildContent
+        </CascadingValue>
     </CascadingValue>
 }
 
 @code {
-    private AccountDto? _account;
+    private AccountState _accountState = default!;
+    private AccountPreferenceState _accountPreferenceState = default!;
 
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public RenderFragment ChildContent { get; set; } = default!;
 
     [CascadingParameter]
-    private LoadRequest? LoadRequest { get; set; }
+    private LoadRequest LoadRequest { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        //Update db
-        //Wait for all
-        //Action to EventCallback
-        HttpResponseMessage? response = await LoadRequest!(() => HttpClient.GetAsync("/api/accounts"));
-        if (response == null)
-            return;
+        _accountState = ObjectsStateFactory.Create<AccountState>(LoadRequest);
+        (_accountPreferenceState = ObjectsStateFactory.Create<AccountPreferenceState>(LoadRequest)).AddOnSetValues(StateHasChanged);
 
-        _account = await response.Content.ReadFromJsonAsync<AccountDto>();
+        await Task.WhenAll(_accountState.GetObject(), _accountPreferenceState.CreateOrGetObject());
     }
 }

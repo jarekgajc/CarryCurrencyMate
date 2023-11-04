@@ -1,0 +1,100 @@
+﻿using Common.Models;
+using Frontend.Models;
+using Frontend.Models.RequestLoaders;
+
+namespace Frontend.Utils.ObjectsStates
+{
+    public abstract class ObjectState<TObject, TId> : IRequestLoaderHolder where TObject : class, IIdHolder<TId>, new()
+    {
+        private readonly ApiCaller<TObject, TId> _apiCaller;
+        private TObject? _obj;
+        private Action _stateHasChanged;
+
+        public bool Valid => _obj != null;
+        public TObject Value => _obj!;
+        public IRequestLoader RequestLoader { get => _apiCaller; }
+        public StateSubscription<TObject> Subscription { get; set; }
+
+        protected abstract string BaseUrl { get; }
+
+        protected ObjectState()
+        {
+            _apiCaller = new ApiCaller<TObject, TId>
+            {
+                BaseUrl = BaseUrl
+            };
+            Subscription = new StateSubscription<TObject>();
+        }
+
+        public void AddOnSetValues(Action stateHasChanged)
+        {
+            _stateHasChanged = stateHasChanged;
+        }
+
+        public async Task<TObject?> GetObject(ApiCallerConfig<TObject>? config = null)
+        {
+            (config ??= new ApiCallerConfig<TObject>()).OnComplete += result => _obj = result;
+            return await _apiCaller.GetItems(config);
+        }
+
+        public async Task<TObject?> GetObject(TId id, ApiCallerConfig<TObject>? config = null)
+        {
+            (config ??= new ApiCallerConfig<TObject>()).OnComplete += result => _obj = result;
+            return await _apiCaller.GetItem(id, config);
+        }
+
+        public async Task<TObject?> CreateOrGetObject(TObject? defaultObj = null)
+        {
+            TObject? response = await GetObject();
+            return response ?? await CreateObject(defaultObj ?? new TObject());
+        }
+
+        public async Task<TObject?> CreateOrGetObject(TId id, TObject? defaultObj = null)
+        {
+            TObject? response = await GetObject(id);
+            return response ?? await CreateObject(_obj = defaultObj ?? new TObject());
+        }
+
+        public async Task<TObject?> CreateObject(TObject obj, ApiCallerConfig<TObject>? config = null)
+        {
+            (config ??= new ApiCallerConfig<TObject>()).OnComplete += result => _obj = result;
+            return await _apiCaller.CreateItem(obj, config);
+        }
+
+        public async Task<TObject?> UpdateObject(ApiCallerConfig<TObject>? config = null)
+        {
+            (config ??= new ApiCallerConfig<TObject>()).OnComplete += result => _obj = result;
+            return await _apiCaller.UpdateItem(Value, config);
+        }
+
+        public async Task<bool> DeleteObject()
+        {
+            return await _apiCaller.DeleteItem(Value.Id, result =>
+            {
+                _obj = null;
+            });
+        }
+
+        public async Task<TObject?> SaveEditorState(EditorState<TObject> editorState)
+        {
+            if (editorState.Exists)
+            {
+                _obj = editorState.Value;
+                return await UpdateObject();
+            }
+            else
+            {
+                return await CreateObject(editorState.Value);
+            }
+        }
+
+        public void SetValues(Action<TObject> update)
+        {
+            update(Value);
+            Subscription.InvokeUpdate();
+            _stateHasChanged.Invoke();
+        }
+
+    }
+    
+}

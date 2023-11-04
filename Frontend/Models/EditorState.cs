@@ -2,7 +2,7 @@
 
 namespace Frontend.Models
 {
-    public delegate Task<bool> SaveEditorState<T>(EditorState<T> editorState) where T : class, new();
+    public delegate Task<T?> SaveEditorState<T>(EditorState<T> editorState) where T : class, new();
 
     public class EditorState<T> where T : class, new()
     {

@@ -1,9 +1,12 @@
 ﻿@using Common.Models.Observations;
 @inject HttpClient HttpClient;
+@implements IDisposable;
+
+<AccountCurrencyPicker />
+<h1>Base currency: @AccountPreferenceState.Value.Currency</h1>
 
 @if(_observation != null)
 {
-    <h1>Base currency: @_observation.BaseCurrency</h1>
     <MudTable Items="@_observationTableData.Rows" Hover="true" Breakpoint="Breakpoint.Sm">
         <ColGroup>
             <col/>
@@ -26,7 +29,7 @@ else if(_showEditObserverTip)
 {
     @if(_showObserverEditor)
     {
-        <ObserverEditor Observer="ObserversState.Default" OnHide="ToggleObserverEditor" OnSave="OnSave"/>
+        <ObserverEditor Observer="ObserversState.Default" OnHide="ToggleObserverEditor" OnSave="ObserversState.SaveEditorState" />
     }
     else
     {
@@ -36,50 +39,80 @@ else if(_showEditObserverTip)
 
 @code {
     private Observation? _observation;
-    private ObservationTableData _observationTableData = null!;
-    private ObservationQuery _query = null!;
+    private ObservationTableData _observationTableData = default!;
+    private ObservationQuery _query = default!;
     private bool _showEditObserverTip;
     private bool _showObserverEditor;
 
     [CascadingParameter]
-    public ObserversState ObserversState { get; set; } = null!;
+    public ObserversState ObserversState { get; set; } = default!;
 
     [CascadingParameter]
-    private LoadRequest LoadRequest { get; set; } = null!;
+    public AccountPreferenceState AccountPreferenceState { get; set; } = default!;
+
+    [CascadingParameter]
+    private LoadRequest LoadRequest { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
         _query = new ObservationQuery
             {
-                BaseCurrency = Currency.EUR,
-                Currencies = new List<Currency> { Currency.PLN, Currency.USD },
+                BaseCurrency = AccountPreferenceState.Value.Currency,
+                Currencies = GetCurrencies(),
                 Observer = ObserversState.Default!,
                 TimeRange = TimeRange.DAY
             };
 
         await LoadObservation();
+        AccountPreferenceState.Subscription.OnUpdate += OnUpdateAccountPreferenceState;
+        //TODO: implement
+        // ObserversState.Subscription.OnUpdate += OnUpdateObserversState;
+    }
+
+    public void Dispose()
+    {
+        AccountPreferenceState.Subscription.OnUpdate -= OnUpdateAccountPreferenceState;
+        // ObserversState.Subscription.OnUpdate -= OnUpdateObserversState;
+    }
+
+    public async void OnUpdateAccountPreferenceState()
+    {
+        //TODO: update only on Currency change
+        _query.BaseCurrency = AccountPreferenceState.Value.Currency;
+        _query.Currencies = GetCurrencies();
+
+        await LoadObservation();
+    }
+
+    public async void OnUpdateObserversState()
+    {
+        //TODO: update only on Currency change
+        await LoadObservation();
+    }
+
+    public List<Currency> GetCurrencies()
+    {
+        var currencies = EnumUtils.GetList<Currency>();
+        currencies.Remove(AccountPreferenceState.Value.Currency);
+        return currencies;
     }
 
     public async Task LoadObservation()
     {
         HttpResponseMessage? response = await LoadRequest!(() => HttpClient.GetAsync($"/api/observations?q={Base64Utils.FromObject(_query)}"), OnFail);
-        if (response == null)
-            return;
-
-        _observation = await response.Content.ReadFromJsonAsync<Observation>();
-        if(_observation != null)
-            _observationTableData = new ObservationTableData(_observation);
-    }
-
-    //TODO: dont load observations before quiting the editor
-    public async Task<bool> OnSave(EditorState<ObserverDto> editorState)
-    {
-        if(await ObserversState.SaveEditorState(editorState))
+        if (response != null)
         {
-            LoadObservation();
-            return true;
+            _observation = await response.Content.ReadFromJsonAsync<Observation>();
+            if(_observation != null)
+            {
+                _observationTableData = new ObservationTableData(_observation);
+                StateHasChanged();
+                return;
+            }
         }
-        return false;
+        _observation = null;
+        _observationTableData = null;
+        StateHasChanged();
     }
 
     public void OnFail(ApiError apiError)

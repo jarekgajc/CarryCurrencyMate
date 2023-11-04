@@ -1,0 +1,29 @@
+﻿@using Common.Models.Observations;
+@using Frontend.Utils.ObjectsStates
+@inject HttpClient HttpClient;
+
+<MudSelect T="Currency" Value="AccountPreference.Currency" ValueChanged="OnChangeSource" Label="Currency" AnchorOrigin="Origin.BottomCenter">
+    @foreach (Currency currency in Enum.GetValues(typeof(Currency)))
+    {
+        <MudSelectItem Value="@currency" />
+    }
+</MudSelect>
+
+@code {
+    [CascadingParameter]
+    private AccountPreferenceState AccountPreferenceState { get; set; } = default!;
+
+    private AccountPreferenceDto AccountPreference => AccountPreferenceState.Value;
+
+    private async void OnChangeSource(Currency currency)
+    {
+        AccountPreferenceState.SetValues(accountPreference =>
+        {
+            accountPreference.Currency = currency;
+        });
+        await AccountPreferenceState.UpdateObject(new ApiCallerConfig<AccountPreferenceDto>()
+        {
+            Background = true
+        });
+    }
+}

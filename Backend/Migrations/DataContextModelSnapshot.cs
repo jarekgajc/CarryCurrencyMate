@@ -40,6 +40,27 @@ namespace Backend.Migrations
                     b.ToTable("Accounts");
                 });
 
+            modelBuilder.Entity("Backend.Models.Accounts.AccountPreference", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Currency")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("AccountPreferences");
+                });
+
             modelBuilder.Entity("Backend.Models.Observers.Observer", b =>
                 {
                     b.Property<long>("Id")
@@ -112,6 +133,17 @@ namespace Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Backend.Models.Accounts.AccountPreference", b =>
+                {
+                    b.HasOne("Backend.Models.Accounts.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("Backend.Models.Observers.Observer", b =>

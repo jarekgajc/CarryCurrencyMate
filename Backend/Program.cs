@@ -1,5 +1,6 @@
 using Backend.Data;
 using Backend.Models.Appsettings;
+using Backend.Services.AccountPreferenceServices;
 using Backend.Services.AccountServices;
 using Backend.Services.ObservationServices;
 using Backend.Services.ObserverServices;
@@ -50,7 +51,8 @@ builder.Services.AddAuthentication().AddJwtBearer(options =>
 });
 
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAccountService, AccountPreferenceService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountPreferenceService, AccountPreferenceService>();
 builder.Services.AddScoped<IObserverService, ObserverService>();
 builder.Services.AddScoped<IObservationService, ObservationService>();
 builder.Services.AddDbContext<DataContext>();

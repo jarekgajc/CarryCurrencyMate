@@ -9,10 +9,10 @@ public class ObjectsStateFactory {
         _httpClient = httpClient;
     }
 
-    public T Create<T>(LoadRequest? loadRequest) where T : IRequestLoader, new() {
+    public T Create<T>(LoadRequest loadRequest) where T : IRequestLoaderHolder, new() {
         T result = new T();
-        result.HttpClient = _httpClient;
-        result.LoadRequest = loadRequest;
+        result.RequestLoader.HttpClient = _httpClient;
+        result.RequestLoader.LoadRequest = loadRequest;
         return result;
     }
 }

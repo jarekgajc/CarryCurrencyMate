@@ -1,7 +1,8 @@
-﻿@inject ISnackbar Snackbar
+﻿@using Frontend.Utils.ObjectsStates
+@inject ISnackbar Snackbar
 
 <MudElement HtmlTag="div" Style="position:relative;width:100%;height:100%">
-    @if (Loading)
+    @if (WaitingRequests > 0)
     {
         <MudElement HtmlTag="div" Style="position:absolute;width:100%;height:100%;background-color:rgba(0.4, 0.4, 0.4, 0.4)">
             <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true" Style="height:100%;">
@@ -16,32 +17,38 @@
 
 
 @code {
-    public bool Loading { get; set; }
-    [Parameter]
-    public RenderFragment ChildContent { get; set; }
-    public LoadRequest LoadRequest { get; set; }
+    public int WaitingRequests { get; set; }
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; } = default!;
+    public LoadRequest LoadRequest { get; set; } = default!;
 
     protected override void OnInitialized()
     {
+        new ApiCallerHandler<>().HandleResponse()
         LoadRequest = async (load, onFail) =>
         {
             try
             {
-                Loading = true;
-                // await Task.Delay(1000);
+                WaitingRequests++;
+                StateHasChanged();
+                // await Task.Delay(3000);
                 HttpResponseMessage response = await load();
-                if(response.IsSuccessStatusCode)
+                switch (response.StatusCode)
                 {
-                    return response;
-                }
-                else if (response.StatusCode == HttpStatusCode.BadRequest)
-                {
-                    var apiError = await response.Content.ReadFromJsonAsync<ApiError>();
-                    if (apiError != null)
-                    {
-                        ShowError(apiError.Code.ToString());
-                        onFail?.Invoke(apiError);
+                    case HttpStatusCode.OK:
+                        return response;
+                    case HttpStatusCode.NoContent:
                         return null;
+                    case HttpStatusCode.BadRequest:
+                    {
+                        var apiError = await response.Content.ReadFromJsonAsync<ApiError>();
+                        if (apiError != null)
+                        {
+                            ShowError(apiError.Code.ToString());
+                            onFail?.Invoke(apiError);
+                            return null;
+                        }
+                        break;
                     }
                 }
                 ShowHttpStatusCodeError(response.StatusCode);
@@ -56,7 +63,7 @@
                 }
             } finally
             {
-                Loading = false;
+                WaitingRequests--;
                 StateHasChanged();
             }
             return null;

@@ -8,7 +8,7 @@ namespace Backend.Models.Accounts
         public int Id { get; set; }
         public Currency Currency { get; set; }
 
-        public required int AccountId;
+        public required int AccountId { get; set; }
         public Account? Account { get; set; }
 
         public static AccountPreference FromDto(int accountId, AccountPreferenceDto dto)

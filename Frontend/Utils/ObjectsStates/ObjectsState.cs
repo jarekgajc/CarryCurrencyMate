@@ -1,60 +1,63 @@
 ﻿using Common.Models;
 using Frontend.Models;
 using Frontend.Models.RequestLoaders;
-using System.Net.Http.Json;
+using static Common.Models.Sources.Walutomat.CurrentExchangeRate;
 
 namespace Frontend.Utils.ObjectsStates
 {
-    public abstract class ObjectsState<TObject, TId> : IRequestLoader where TObject : class, IIdHolder<TId>, new()
+    public abstract class ObjectsState<TObject, TId> : IRequestLoaderHolder where TObject : class, IIdHolder<TId>, new()
     {
+        private readonly ApiCaller<TObject, TId> _apiCaller;
         private List<TObject>? _objects;
 
-        protected abstract string BaseUrl { get; }
-        
-        public HttpClient HttpClient { get; set; }
-        public LoadRequest LoadRequest { get; set; }
-
-        public bool Valid { get; private set; }
+        public bool Valid => _objects != null;
         public List<TObject> Objects => _objects ??= new List<TObject>();
+        public IRequestLoader RequestLoader { get => _apiCaller; }
+        public StateSubscription<TObject> StateSubscription { get; set; }
 
-        public async Task<bool> GetObjects()
+        protected abstract string BaseUrl { get; }
+
+        protected ObjectsState()
         {
-            var response = await LoadRequest(() => HttpClient.GetAsync($"/{BaseUrl}"));
-            if(response == null)
-                return false;
-            _objects = (await response.Content.ReadFromJsonAsync<List<TObject>>())!;
-            Valid = true;
-            return true;
+            _apiCaller = new ApiCaller<TObject, TId>
+            {
+                BaseUrl = BaseUrl
+            };
+            StateSubscription = new StateSubscription<TObject>();
         }
 
-        public async Task<bool> CreateObject(TObject obj)
+        public async Task<List<TObject>?> GetObjects(ApiCallerConfig<List<TObject>>? config = null)
         {
-            var response = await LoadRequest(() => HttpClient.PostAsJsonAsync($"/{BaseUrl}", obj));
-            if (response == null)
-                return false;
-            _objects.Add((await response.Content.ReadFromJsonAsync<TObject>())!);
-            return true;
+            (config ??= new ApiCallerConfig<List<TObject>>()).OnComplete += result => _objects = result;
+            return await _apiCaller.GetItems(config);
         }
 
-        public async Task<bool> UpdateObject(TObject obj)
+        public async Task<TObject?> CreateObject(TObject obj, ApiCallerConfig<TObject>? config = null)
         {
-            var response = await LoadRequest(() => HttpClient.PutAsJsonAsync($"/{BaseUrl}/{obj.Id}", obj));
-            if (response == null)
-                return false;
-            int index = _objects.FindIndex(o => o.Id.Equals(obj.Id));
-            _objects[index] = (await response.Content.ReadFromJsonAsync<TObject>())!;
-            return true;
+            (config ??= new ApiCallerConfig<TObject>()).OnComplete += result => _objects!.Add(result);
+            return await _apiCaller.CreateItem(obj, config);
+        }
+
+        public async Task<TObject?> UpdateObject(TObject obj, ApiCallerConfig<TObject>? config = null)
+        {
+            (config ??= new ApiCallerConfig<TObject>()).OnComplete += result =>
+            {
+                int index = _objects!.FindIndex(o => o.Id.Equals(result.Id));
+                _objects[index] = result;
+            };
+            return await _apiCaller.UpdateItem(obj, config);
         }
 
         public async Task<bool> DeleteObject(TId id)
         {
-            var response = await LoadRequest(() => HttpClient.DeleteAsync($"/{BaseUrl}/{id}"));
-            if (response == null || bool.Parse(await response.Content.ReadAsStringAsync()))
-                return false;
-            return true;
+            return await _apiCaller.DeleteItem(id, result =>
+            {
+                int index = _objects!.FindIndex(o => o.Id.Equals(result));
+                _objects.RemoveAt(index);
+            });
         }
 
-        public async Task<bool> SaveEditorState(EditorState<TObject> editorState)
+        public async Task<TObject?> SaveEditorState(EditorState<TObject> editorState)
         {
             if (editorState.Exists)
             {
@@ -67,5 +70,5 @@ namespace Frontend.Utils.ObjectsStates
         }
 
     }
-    
+
 }

@@ -15,7 +15,7 @@ namespace Common.Models.Observations
         public required TimeRange TimeRange { get; set; }
         public required ObserverDto Observer { get; set; }
 
-        public Observation ToBaseObservation()
+        public Observation ToObservationBase()
         {
             return new Observation {
                 BaseCurrency = BaseCurrency,

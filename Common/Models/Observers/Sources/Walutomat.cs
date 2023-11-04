@@ -24,7 +24,7 @@ namespace Common.Models.Observers.Sources
 
         public async Task<Observation> GetObservation(ObservationQuery query)
         {
-            Observation observation = query.ToBaseObservation();
+            Observation observation = query.ToObservationBase();
             WalutomatClient client = new WalutomatClient(_dev, query.Observer.SourceAuth.ApiKey!);
             DateTime dateTime = DateTime.UtcNow;
 

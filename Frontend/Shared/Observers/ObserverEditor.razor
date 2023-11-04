@@ -42,12 +42,13 @@
 
     private void OnChangeSource(ObservationSource observationSource)
     {
+        //TODO: Value.Source may not change (check if you have ro set it manually)
         _observerSource = IObserverSource.GetInstance(observationSource);
     }
 
     public async void Save()
     {
-        if(await OnSave(_editorState!))
+        if(await OnSave(_editorState!) != null)
         {
             OnHide();
         }

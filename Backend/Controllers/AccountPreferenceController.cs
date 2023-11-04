@@ -20,21 +20,21 @@ namespace Backend.Controllers
         }
 
         [HttpGet("")]
-        public async Task<AccountPreference?> GetAccountPreference()
+        public async Task<AccountPreferenceDto?> GetAccountPreference()
         {
-            return await _accountPreferenceService.GetAccountPreference(User.GetAccountId());
+            return (await _accountPreferenceService.GetAccountPreference(User.GetAccountId()))?.ToDto();
         }
 
         [HttpPost("")]
-        public async Task<AccountPreference> CreateAccountPreference(AccountPreferenceDto accountPreference)
+        public async Task<AccountPreferenceDto> CreateAccountPreference(AccountPreferenceDto accountPreference)
         {
-            return await _accountPreferenceService.CreateAccountPreference(AccountPreference.FromDto(User.GetAccountId(), accountPreference));
+            return (await _accountPreferenceService.CreateAccountPreference(AccountPreference.FromDto(User.GetAccountId(), accountPreference))).ToDto();
         }
 
         [HttpPut("{id}")]
-        public async Task<AccountPreference> UpdateAccountPreference(int id, AccountPreferenceDto accountPreference)
+        public async Task<AccountPreferenceDto> UpdateAccountPreference(int id, AccountPreferenceDto accountPreference)
         {
-            return await _accountPreferenceService.UpdateAccountPreference(id, AccountPreference.FromDto(User.GetAccountId(), accountPreference));
+            return (await _accountPreferenceService.UpdateAccountPreference(id, AccountPreference.FromDto(User.GetAccountId(), accountPreference))).ToDto();
         }
     }
 }
