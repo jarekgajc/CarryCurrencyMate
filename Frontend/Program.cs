@@ -21,6 +21,7 @@ builder.Services.AddMudServices(config =>
 });
 
 builder.Services.AddSingleton<ObjectsStateFactory>();
+builder.Services.AddSingleton<RequestLoaderFactory>();
 
 builder.Services.AddScoped<AuthProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<AuthProvider>());

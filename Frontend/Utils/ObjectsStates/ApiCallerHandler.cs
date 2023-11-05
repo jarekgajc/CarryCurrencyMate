@@ -7,18 +7,21 @@ using System.Net.Http.Json;
 
 namespace Frontend.Utils.ObjectsStates
 {
-    public class ApiCallerHandler<T> where T : class
+    public class ApiCallerHandler
     {
-        private readonly ApiCallerConfig<T> _config;
+        private readonly ApiCallerConfig _config;
 
-        public ApiCallerHandler(ApiCallerConfig<T>? config)
+        public ApiCallerHandler(RequestLoadController loadController, ApiCallerConfig? config)
         {
-            _config = config ?? new ApiCallerConfig<T>();
+            _config = config ?? new ApiCallerConfig();
+            _config.OnStart += loadController.OnStart;
+            _config.OnComplete += loadController.OnComplete;
+            _config.OnFail += loadController.OnFail;
         }
 
-        public async Task<T?> HandleResponse(Func<Task<HttpResponseMessage>> load)
+        public async Task<T?> GetObject<T>(Func<Task<HttpResponseMessage>> load) where T : class
         {
-            //TODO: LoadRequest powinien subskrybować onComplete i onFail
+            //TODO: RequestLoadController powinien subskrybować onComplete i onFail
             //TODO: use proper loader if load background
             HttpResponseMessage? response = await LoadRequest(load);
             if (response == null)
@@ -32,11 +35,22 @@ namespace Frontend.Utils.ObjectsStates
             return result;
         }
 
+        public async Task<HttpResponseMessage> GetResponse(Func<Task<HttpResponseMessage>> load)
+        {
+            HttpResponseMessage? response = await LoadRequest(load);
+            if (response == null)
+                return null;
+
+            _config.InvokeComplete(response);
+            return response;
+        }
+
         private async Task<HttpResponseMessage?> LoadRequest(Func<Task<HttpResponseMessage>> load)
         {
             try
             {
                 // await Task.Delay(3000);
+                _config.InvokeStart();
                 HttpResponseMessage? response = await load();
                 switch (response.StatusCode)
                 {

@@ -21,7 +21,7 @@
         {
             accountPreference.Currency = currency;
         });
-        await AccountPreferenceState.UpdateObject(new ApiCallerConfig<AccountPreferenceDto>()
+        await AccountPreferenceState.UpdateObject(new ApiCallerConfig()
         {
             Background = true
         });

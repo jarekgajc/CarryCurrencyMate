@@ -1,6 +1,6 @@
 ﻿using Frontend.Models.RequestLoaders;
 
-namespace Frontend.Shared.Providers; 
+namespace Frontend.Shared.Providers;
 
 public class ObjectsStateFactory {
     private readonly HttpClient _httpClient;
@@ -9,10 +9,10 @@ public class ObjectsStateFactory {
         _httpClient = httpClient;
     }
 
-    public T Create<T>(LoadRequest loadRequest) where T : IRequestLoaderHolder, new() {
+    public T Create<T>(RequestLoadController requestLoadController) where T : IRequestLoaderHolder, new() {
         T result = new T();
         result.RequestLoader.HttpClient = _httpClient;
-        result.RequestLoader.LoadRequest = loadRequest;
+        result.RequestLoader.RequestLoadController = requestLoadController;
         return result;
     }
 }

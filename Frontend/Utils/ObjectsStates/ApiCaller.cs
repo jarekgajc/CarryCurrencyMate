@@ -4,46 +4,60 @@ using Frontend.Models.RequestLoaders;
 using MudBlazor;
 using System.Net;
 using System.Net.Http.Json;
+using static MudBlazor.CategoryTypes;
 
 namespace Frontend.Utils.ObjectsStates
 {
-    public class ApiCaller<TItem, TId> : IRequestLoader where TItem : class, IIdHolder<TId>, new()
+    public class ApiCaller : IRequestLoader
     {
-        public required string BaseUrl { get; set; }
+        public string BaseUrl { get; set; }
         public HttpClient HttpClient { get; set; } = default!;
-        public LoadRequest LoadRequest { get; set; } = default!;
+        public RequestLoadController RequestLoadController { get; set; }
 
-        public async Task<T?> GetItem<T>(TId id, ApiCallerConfig<T>? config = null) where T : class
+        public ApiCaller(string baseUrl)
         {
-            return await new ApiCallerHandler<T>(config).HandleResponse(() => HttpClient.GetAsync($"/{BaseUrl}/{id}"));
+            BaseUrl = baseUrl;
         }
 
-        public async Task<T?> GetItems<T>(ApiCallerConfig<T>? config = null) where T : class
+        public async Task<T?> GetItem<T, TId>(TId id, ApiCallerConfig? config = null) where T : class
         {
-            return await new ApiCallerHandler<T>(config).HandleResponse(() => HttpClient.GetAsync($"/{BaseUrl}"));
+            return await new ApiCallerHandler(RequestLoadController, config).GetObject<T>(() => HttpClient.GetAsync($"/{BaseUrl}/{id}"));
         }
 
-        public async Task<T?> CreateItem<T>(T item, ApiCallerConfig<T>? config = null) where T : class
+        public async Task<T?> GetItems<T>(ApiCallerConfig? config = null) where T : class
         {
-            return await new ApiCallerHandler<T>(config).HandleResponse(() => HttpClient.PostAsJsonAsync($"/{BaseUrl}", item));
+            return await new ApiCallerHandler(RequestLoadController, config).GetObject<T>(() => HttpClient.GetAsync($"/{BaseUrl}"));
         }
 
-        public async Task<T?> UpdateItem<T>(T item, ApiCallerConfig<T>? config = null) where T : class, IIdHolder<TId>
+        public async Task<T?> CreateItem<T>(T item, ApiCallerConfig? config = null) where T : class
         {
-            return await new ApiCallerHandler<T>(config).HandleResponse(() => HttpClient.PutAsJsonAsync($"/{BaseUrl}/{item.Id}", item));
+            return await new ApiCallerHandler(RequestLoadController, config).GetObject<T>(() => HttpClient.PostAsJsonAsync($"/{BaseUrl}", item));
         }
 
-        public async Task<bool> DeleteItem(TId id, Action<TId> onSuccess)
+        public async Task<T?> UpdateItem<T, TId>(T item, ApiCallerConfig? config = null) where T : class, IIdHolder<TId>
+        {
+            return await new ApiCallerHandler(RequestLoadController, config).GetObject<T>(() => HttpClient.PutAsJsonAsync($"/{BaseUrl}/{item.Id}", item));
+        }
+
+        public async Task<bool> DeleteItem()
         {
             throw new NotImplementedException();
-            //var response = await LoadRequest(() => HttpClient.DeleteAsync($"/{BaseUrl}/{id}"));
+            //var response = await RequestLoadController(() => HttpClient.DeleteAsync($"/{BaseUrl}/{id}"));
             //if (response == null || bool.Parse(await response.Content.ReadAsStringAsync()))
             //    return false;
             //onSuccess(id);
             return true;
         }
 
-        
 
+        public async Task<HttpResponseMessage?> Post<T>(T body, ApiCallerConfig? config = null)
+        {
+            return await new ApiCallerHandler(RequestLoadController, config).GetResponse(() => HttpClient.PostAsJsonAsync($"/{BaseUrl}", body));
+        }
+
+        public async Task<HttpResponseMessage?> Get(ApiCallerConfig? config = null)
+        {
+            return await new ApiCallerHandler(RequestLoadController, config).GetResponse(() => HttpClient.GetAsync($"/{BaseUrl}"));
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿@using Common.Models.Observations;
-@inject HttpClient HttpClient;
+@using Frontend.Utils.ObjectsStates
+@inject RequestLoaderFactory RequestLoaderFactory;
 @implements IDisposable;
 
 <AccountCurrencyPicker />
@@ -51,7 +52,7 @@ else if(_showEditObserverTip)
     public AccountPreferenceState AccountPreferenceState { get; set; } = default!;
 
     [CascadingParameter]
-    private LoadRequest LoadRequest { get; set; } = default!;
+    private RequestLoadController RequestLoadController { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -99,25 +100,24 @@ else if(_showEditObserverTip)
 
     public async Task LoadObservation()
     {
-        HttpResponseMessage? response = await LoadRequest!(() => HttpClient.GetAsync($"/api/observations?q={Base64Utils.FromObject(_query)}"), OnFail);
-        if (response != null)
+        _observation = await RequestLoaderFactory
+            .CreateApiCaller($"api/observations?q={Base64Utils.FromObject(_query)}", RequestLoadController)
+            .GetItems<Observation>(new ApiCallerConfig().AddOnFail(OnFail));
+
+        if(_observation != null)
         {
-            _observation = await response.Content.ReadFromJsonAsync<Observation>();
-            if(_observation != null)
-            {
-                _observationTableData = new ObservationTableData(_observation);
-                StateHasChanged();
-                return;
-            }
+            _observationTableData = new ObservationTableData(_observation);
+            StateHasChanged();
+            return;
         }
         _observation = null;
         _observationTableData = null;
         StateHasChanged();
     }
 
-    public void OnFail(ApiError apiError)
+    public void OnFail(ApiCallerError error)
     {
-        if(apiError.Code == ApiErrorCode.ConnectionToSourceFailed)
+        if(error.ApiError?.Code == ApiErrorCode.ConnectionToSourceFailed)
         {
             _showEditObserverTip = true;
         }

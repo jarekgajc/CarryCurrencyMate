@@ -1,6 +1,7 @@
 ﻿@page "/auth/registration"
-@inject HttpClient HttpClient;
+@    using Frontend.Utils.ObjectsStates
 @inject NavigationManager Navigation
+@inject RequestLoaderFactory RequestLoaderFactory;
 
 <MudContainer MaxWidth="MaxWidth.Small">
     <MudCard Outlined="true">
@@ -23,14 +24,16 @@
 </MudContainer>
 
 @code {
-    [CascadingParameter] private LoadRequest LoadRequest { get; set; }
+
+    [CascadingParameter]
+    private RequestLoadController RequestLoadController { get; set; } = default!;
 
     public string RepeatPassword { get; set; }
     public UserDto UserDto { get; set; } = new UserDto();
 
     public async void Register()
     {
-        HttpResponseMessage? response = await LoadRequest(() => HttpClient.PostAsJsonAsync("/auth/register", UserDto));
+        HttpResponseMessage? response = await RequestLoaderFactory.CreateApiCaller("auth/register", RequestLoadController).Post(UserDto);
         if (response != null)
             GoToLogin();
     }

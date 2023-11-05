@@ -32,7 +32,7 @@
     public ObserverDto Value => _editorState!.Value;
 
     [CascadingParameter]
-    private LoadRequest? LoadRequest { get; set; }
+    private RequestLoadController RequestLoadController { get; set; } = default!;
 
     protected override void OnInitialized()
     {

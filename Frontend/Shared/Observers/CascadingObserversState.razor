@@ -11,13 +11,13 @@
     private ObserversState? _observersState;
 
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public RenderFragment ChildContent { get; set; } = default!;
 
     [CascadingParameter]
-    private LoadRequest? LoadRequest { get; set; }
+    private RequestLoadController RequestLoadController { get; set; } = default!;
 
     protected override async Task OnInitializedAsync() {
-        _observersState = ObjectsStateFactory.Create<ObserversState>(LoadRequest);
+        _observersState = ObjectsStateFactory.Create<ObserversState>(RequestLoadController);
         await _observersState.GetObjects();
     }
 }

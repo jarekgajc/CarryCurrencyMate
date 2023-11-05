@@ -1,6 +1,6 @@
 ﻿@page "/auth/login"
 @inject NavigationManager Navigation
-@inject HttpClient HttpClient;
+@inject RequestLoaderFactory RequestLoaderFactory;
 @inject AuthProvider authProvider;
 
 
@@ -25,11 +25,13 @@
 
 @code {
     public UserDto UserDto { get; set; } = new UserDto();
-    [CascadingParameter] private LoadRequest? LoadRequest { get; set; }
+
+    [CascadingParameter]
+    private RequestLoadController RequestLoadController { get; set; } = default!;
 
     public async void LogIn()
     {
-        HttpResponseMessage? response = await LoadRequest!(() => HttpClient.PostAsJsonAsync("/api/auth/login", UserDto));
+        HttpResponseMessage? response = await RequestLoaderFactory.CreateApiCaller("api/auth/login", RequestLoadController).Post(UserDto);
         if (response == null)
             return;
 

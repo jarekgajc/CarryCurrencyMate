@@ -4,13 +4,19 @@ using System.Net.Http.Json;
 
 namespace Frontend.Utils.ObjectsStates
 {
-    public class ApiCallerConfig<T>
+    public class ApiCallerConfig
     {
         public bool Background { get; set; }
-        public event Action<T>? OnComplete;
+        public event Action? OnStart;
+        public event Action<object>? OnComplete;
         public event Action<ApiCallerError>? OnFail;
 
-        public void InvokeComplete(T response)
+        public void InvokeStart()
+        {
+            OnStart?.Invoke();
+        }
+
+        public void InvokeComplete(object response)
         {
             OnComplete?.Invoke(response);
         }
@@ -18,6 +24,12 @@ namespace Frontend.Utils.ObjectsStates
         public void InvokeFail(ApiCallerError error)
         {
             OnFail?.Invoke(error);
+        }
+
+        public ApiCallerConfig AddOnFail(Action<ApiCallerError> onFail)
+        {
+            OnFail += onFail;
+            return this;
         }
     }
 }

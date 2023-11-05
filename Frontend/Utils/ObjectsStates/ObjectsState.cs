@@ -1,13 +1,12 @@
 ﻿using Common.Models;
 using Frontend.Models;
 using Frontend.Models.RequestLoaders;
-using static Common.Models.Sources.Walutomat.CurrentExchangeRate;
 
 namespace Frontend.Utils.ObjectsStates
 {
     public abstract class ObjectsState<TObject, TId> : IRequestLoaderHolder where TObject : class, IIdHolder<TId>, new()
     {
-        private readonly ApiCaller<TObject, TId> _apiCaller;
+        private readonly ApiCaller _apiCaller;
         private List<TObject>? _objects;
 
         public bool Valid => _objects != null;
@@ -19,42 +18,52 @@ namespace Frontend.Utils.ObjectsStates
 
         protected ObjectsState()
         {
-            _apiCaller = new ApiCaller<TObject, TId>
+            _apiCaller = new ApiCaller
             {
                 BaseUrl = BaseUrl
             };
             StateSubscription = new StateSubscription<TObject>();
         }
 
-        public async Task<List<TObject>?> GetObjects(ApiCallerConfig<List<TObject>>? config = null)
+        public async Task<List<TObject>?> GetObjects(ApiCallerConfig? config = null)
         {
-            (config ??= new ApiCallerConfig<List<TObject>>()).OnComplete += result => _objects = result;
-            return await _apiCaller.GetItems(config);
+            List<TObject>? result = await _apiCaller.GetItems<List<TObject>>(config);
+            if (result != null)
+            {
+                _objects = result;
+            }
+            return result;
         }
 
-        public async Task<TObject?> CreateObject(TObject obj, ApiCallerConfig<TObject>? config = null)
+        public async Task<TObject?> CreateObject(TObject obj, ApiCallerConfig? config = null)
         {
-            (config ??= new ApiCallerConfig<TObject>()).OnComplete += result => _objects!.Add(result);
-            return await _apiCaller.CreateItem(obj, config);
+            TObject? result = await _apiCaller.CreateItem(obj, config);
+            if (result != null)
+            {
+                _objects!.Add(result);
+            }
+            return result;
         }
 
-        public async Task<TObject?> UpdateObject(TObject obj, ApiCallerConfig<TObject>? config = null)
+        public async Task<TObject?> UpdateObject(TObject obj, ApiCallerConfig? config = null)
         {
-            (config ??= new ApiCallerConfig<TObject>()).OnComplete += result =>
+            TObject? result = await _apiCaller.UpdateItem<TObject, TId>(obj, config);
+            if (result != null)
             {
                 int index = _objects!.FindIndex(o => o.Id.Equals(result.Id));
                 _objects[index] = result;
-            };
-            return await _apiCaller.UpdateItem(obj, config);
+            }
+            return result;
         }
 
         public async Task<bool> DeleteObject(TId id)
         {
-            return await _apiCaller.DeleteItem(id, result =>
-            {
-                int index = _objects!.FindIndex(o => o.Id.Equals(result));
-                _objects.RemoveAt(index);
-            });
+            throw new NotImplementedException();
+            //return await _apiCaller.DeleteItem(id, result =>
+            //{
+            //    int index = _objects!.FindIndex(o => o.Id.Equals(result));
+            //    _objects.RemoveAt(index);
+            //});
         }
 
         public async Task<TObject?> SaveEditorState(EditorState<TObject> editorState)

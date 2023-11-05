@@ -18,12 +18,12 @@
     public RenderFragment ChildContent { get; set; } = default!;
 
     [CascadingParameter]
-    private LoadRequest LoadRequest { get; set; } = default!;
+    private RequestLoadController RequestLoadController { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
-        _accountState = ObjectsStateFactory.Create<AccountState>(LoadRequest);
-        (_accountPreferenceState = ObjectsStateFactory.Create<AccountPreferenceState>(LoadRequest)).AddOnSetValues(StateHasChanged);
+        _accountState = ObjectsStateFactory.Create<AccountState>(RequestLoadController);
+        (_accountPreferenceState = ObjectsStateFactory.Create<AccountPreferenceState>(RequestLoadController)).AddOnSetValues(StateHasChanged);
 
         await Task.WhenAll(_accountState.GetObject(), _accountPreferenceState.CreateOrGetObject());
     }
