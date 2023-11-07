@@ -12,17 +12,14 @@ namespace Frontend.Utils.ObjectsStates
         public bool Valid => _objects != null;
         public List<TObject> Objects => _objects ??= new List<TObject>();
         public IRequestLoader RequestLoader { get => _apiCaller; }
-        public StateSubscription<TObject> StateSubscription { get; set; }
+        public StateSubscription<TObject> Subscription { get; set; }
 
         protected abstract string BaseUrl { get; }
 
         protected ObjectsState()
         {
-            _apiCaller = new ApiCaller
-            {
-                BaseUrl = BaseUrl
-            };
-            StateSubscription = new StateSubscription<TObject>();
+            _apiCaller = new ApiCaller(BaseUrl);
+            Subscription = new StateSubscription<TObject>();
         }
 
         public async Task<List<TObject>?> GetObjects(ApiCallerConfig? config = null)

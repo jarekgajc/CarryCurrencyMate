@@ -1,0 +1,37 @@
+﻿@page "/exchange/{CurrencyPair}"
+@using Common.Models.Observations
+@inject RequestLoaderFactory RequestLoaderFactory;
+
+
+
+@code {
+    private Observation? _observation;
+    private ObservationQuery _query = default!;
+
+    [CascadingParameter]
+    public ObserversState ObserversState { get; set; } = default!;
+
+    [CascadingParameter]
+    private RequestLoadController RequestLoadController { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    private Currency From { get; set; }
+    [Parameter, EditorRequired]
+    private Currency To { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _query = new ObservationQuery
+        {
+            BaseCurrency = From,
+            Currencies = new List<Currency>() {To},
+            Observer = ObserversState.Default!,
+            TimeRange = TimeRange.CURRENT
+        };
+
+        _observation = await RequestLoaderFactory
+            .CreateApiCaller($"api/observations?q={Base64Utils.FromObject(_query)}", RequestLoadController)
+            .GetItems<Observation>();
+    }
+
+}

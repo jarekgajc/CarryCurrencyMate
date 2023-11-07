@@ -14,15 +14,16 @@ namespace Frontend.Utils.ObjectsStates
         public ApiCallerHandler(RequestLoadController loadController, ApiCallerConfig? config)
         {
             _config = config ?? new ApiCallerConfig();
-            _config.OnStart += loadController.OnStart;
-            _config.OnComplete += loadController.OnComplete;
-            _config.OnFail += loadController.OnFail;
+            if(!_config.Background)
+            {
+                _config.OnStart += loadController.OnStart;
+                _config.OnComplete += loadController.OnComplete;
+                _config.OnFail += loadController.OnFail;
+            }
         }
 
         public async Task<T?> GetObject<T>(Func<Task<HttpResponseMessage>> load) where T : class
         {
-            //TODO: RequestLoadController powinien subskrybować onComplete i onFail
-            //TODO: use proper loader if load background
             HttpResponseMessage? response = await LoadRequest(load);
             if (response == null)
                 return null;

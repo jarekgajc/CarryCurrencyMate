@@ -19,10 +19,7 @@ namespace Frontend.Utils.ObjectsStates
 
         protected ObjectState()
         {
-            _apiCaller = new ApiCaller
-            {
-                BaseUrl = BaseUrl
-            };
+            _apiCaller = new ApiCaller(BaseUrl);
             Subscription = new StateSubscription<TObject>();
         }
 

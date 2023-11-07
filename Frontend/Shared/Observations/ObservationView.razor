@@ -1,14 +1,17 @@
-﻿@using Common.Models.Observations;
-@using Frontend.Utils.ObjectsStates
-@inject RequestLoaderFactory RequestLoaderFactory;
+﻿@inject RequestLoaderFactory RequestLoaderFactory;
 @implements IDisposable;
 
 <AccountCurrencyPicker />
 <h1>Base currency: @AccountPreferenceState.Value.Currency</h1>
+<MudPopover Open="true" OverflowBehavior="OverflowBehavior.FlipAlways" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Paper="false">
+    <MudPaper Outlined="true" Class="px-4 py-8">
+        <MudText>Scroll your browser to see effect.</MudText>
+    </MudPaper>
+</MudPopover>
 
 @if(_observation != null)
 {
-    <MudTable Items="@_observationTableData.Rows" Hover="true" Breakpoint="Breakpoint.Sm">
+    <MudTable Items="@_observationTableData.Rows" Hover="true" Breakpoint="Breakpoint.Sm" OnRowClick="RowClickEvent" T="ObservationTableData.Row">
         <ColGroup>
             <col/>
             <col style="width: 80px;"/>
@@ -66,14 +69,13 @@ else if(_showEditObserverTip)
 
         await LoadObservation();
         AccountPreferenceState.Subscription.OnUpdate += OnUpdateAccountPreferenceState;
-        //TODO: implement
-        // ObserversState.Subscription.OnUpdate += OnUpdateObserversState;
+        ObserversState.Subscription.OnUpdate += OnUpdateObserversState;
     }
 
     public void Dispose()
     {
         AccountPreferenceState.Subscription.OnUpdate -= OnUpdateAccountPreferenceState;
-        // ObserversState.Subscription.OnUpdate -= OnUpdateObserversState;
+        ObserversState.Subscription.OnUpdate -= OnUpdateObserversState;
     }
 
     public async void OnUpdateAccountPreferenceState()
@@ -96,6 +98,11 @@ else if(_showEditObserverTip)
         var currencies = EnumUtils.GetList<Currency>();
         currencies.Remove(AccountPreferenceState.Value.Currency);
         return currencies;
+    }
+
+    private void RowClickEvent(TableRowClickEventArgs<ObservationTableData.Row> tableRowClickEventArgs)
+    {
+        
     }
 
     public async Task LoadObservation()

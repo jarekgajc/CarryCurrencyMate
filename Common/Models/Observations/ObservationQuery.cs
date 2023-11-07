@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Common.Models.Observations
 {
-    //TODO: somehow send it using "GET"
     public class ObservationQuery
     {
         public required Currency BaseCurrency { get; set; }
@@ -26,6 +25,6 @@ namespace Common.Models.Observations
 
     public enum TimeRange
     {
-        HOUR, DAY, WEEK, MONTH, YEAR
+        CURRENT, HOUR, DAY, WEEK, MONTH, YEAR
     }
 }

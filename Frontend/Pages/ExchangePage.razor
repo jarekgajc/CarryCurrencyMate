@@ -1,0 +1,21 @@
+﻿@page "/exchange/{CurrencyPair}"
+
+<PageTitle>Exchange @CurrencyPair</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">Weather forecast</MudText>
+<MudText Class="mb-8">This component demonstrates fetching data from the server.</MudText>
+<ExchangeView From="_from" To="_to"/>
+
+@code {
+    private Currency _from;
+    private Currency _to;
+
+    [Parameter]
+    public string CurrencyPair { get; set; }
+
+    protected override void OnInitialized()
+    {
+        CurrencyUtils.FromPair(CurrencyPair, out _from, out _to);
+    }
+
+}
