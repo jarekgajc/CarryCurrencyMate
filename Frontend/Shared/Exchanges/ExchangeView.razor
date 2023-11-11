@@ -1,12 +1,31 @@
-﻿@page "/exchange/{CurrencyPair}"
-@using Common.Models.Observations
+﻿@using Common.Models.Exchanges
 @inject RequestLoaderFactory RequestLoaderFactory;
 
-
+@if (ExchangeRateValue != null)
+{
+    <MudCard>
+        <MudTabs ActivePanelIndexChanged="OnChangeActivePanelIndex">
+            <MudCardContent>
+                <MudTabPanel Text="@string.Concat("Buy ", To)">
+                    <ExchangeForm Buying="true" A="A" B="B" ExchangeRate="ExchangeRateValue.Buy" OnChangeValue="OnChangeFieldValue"/>
+                </MudTabPanel>
+                <MudTabPanel Text="@string.Concat("Sell ", To)">
+                    <ExchangeForm Buying="false" A="B" B="A" ExchangeRate="ExchangeRateValue.Sell" OnChangeValue="OnChangeFieldValue"/>
+                </MudTabPanel>
+            </MudCardContent>
+        </MudTabs>
+        <MudCardActions>
+            <MudButton Variant="Variant.Text" Color="Color.Secondary" @onclick="Cancel">Cancel</MudButton>
+            <MudSpacer />
+            <MudButton Variant="Variant.Text" Color="Color.Primary" @onclick="Continue" Disabled="!IsValid()">Continue</MudButton>
+        </MudCardActions>
+    </MudCard>
+}
 
 @code {
     private Observation? _observation;
     private ObservationQuery _query = default!;
+    private ExchangeRequest? _exchangeRequest = default!;
 
     [CascadingParameter]
     public ObserversState ObserversState { get; set; } = default!;
@@ -15,23 +34,68 @@
     private RequestLoadController RequestLoadController { get; set; } = default!;
 
     [Parameter, EditorRequired]
-    private Currency From { get; set; }
+    public Currency From { get; set; }
     [Parameter, EditorRequired]
-    private Currency To { get; set; }
+    public Currency To { get; set; }
+
+    public ExchangeForm.Field A { get; set; } = default!;
+    public ExchangeForm.Field B { get; set; } = default!;
+    public ExchangeRateValue? ExchangeRateValue { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        OnChangeActivePanelIndex();
+
         _query = new ObservationQuery
         {
             BaseCurrency = From,
-            Currencies = new List<Currency>() {To},
+            Currencies = new List<Currency> {To},
             Observer = ObserversState.Default!,
             TimeRange = TimeRange.CURRENT
+        };
+
+        _exchangeRequest = new ExchangeRequest
+        {
+            From = From,
+            To = To,
+            ObserverId = _query.Observer.Id,
+            Value = 0
         };
 
         _observation = await RequestLoaderFactory
             .CreateApiCaller($"api/observations?q={Base64Utils.FromObject(_query)}", RequestLoadController)
             .GetItems<Observation>();
+        
+        if (_observation != null)
+        {
+            ExchangeRateValue = _observation.ExchangeRates[0].Values[0];
+        }
+    }
+
+    public bool IsValid()
+    {
+        return A.Value != null && B.Value != null;
+    }
+
+    private void Cancel()
+    {
+        
+    }
+
+    private void Continue()
+    {
+
+    }
+
+    private void OnChangeActivePanelIndex()
+    {
+        A = new ExchangeForm.Field(From);
+        B = new ExchangeForm.Field(To);
+    }
+
+    private void OnChangeFieldValue()
+    {
+        
     }
 
 }

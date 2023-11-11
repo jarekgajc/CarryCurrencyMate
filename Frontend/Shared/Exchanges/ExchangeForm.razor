@@ -1,0 +1,69 @@
+﻿
+<MudNumericField
+    Label="@A.Currency.ToString()"
+    Format="N2"
+    T="decimal?"
+    Min="0"
+    HideSpinButtons="true"
+    Value="@A.Value"
+    ValueChanged="SetValueA"
+    Adornment="Adornment.Start"
+    AdornmentIcon="@Icons.Material.Filled.Remove"/>
+<MudNumericField
+    Label="@B.Currency.ToString()"
+    Format="N2"
+    T="decimal?"
+    Min="0"
+    HideSpinButtons="true"
+    Value="@B.Value"
+    ValueChanged="SetValueB"
+    Adornment="Adornment.Start"
+    AdornmentIcon="@Icons.Material.Filled.Add"/>
+<MudText Typo="Typo.subtitle2">Exchange rate: @ExchangeRate</MudText>
+
+
+@code {
+    private decimal _exchangeRateValue;
+
+    [Parameter, EditorRequired]
+    public Field A { get; set; } = default!;
+    [Parameter, EditorRequired]
+    public Field B { get; set; } = default!;
+    [Parameter, EditorRequired]
+    public decimal ExchangeRate { get; set; }
+    [Parameter, EditorRequired]
+    public bool Buying { get; set; }
+    [Parameter, EditorRequired]
+    public EventCallback OnChangeValue { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _exchangeRateValue = Buying ? ExchangeRate : 1 / ExchangeRate;
+    }
+
+    public class Field
+    {
+        public Currency Currency { get; set; }
+        public decimal? Value { get; set; }
+
+        public Field(Currency currency)
+        {
+            Currency = currency;
+        }
+    }
+
+    public void SetValueA(decimal? value)
+    {
+        A.Value = value;
+        B.Value = A.Value * _exchangeRateValue;
+        OnChangeValue.InvokeAsync();
+    }
+
+    public void SetValueB(decimal? value)
+    {
+        B.Value = value;
+        A.Value = B.Value / _exchangeRateValue;
+        OnChangeValue.InvokeAsync();
+    }
+
+}

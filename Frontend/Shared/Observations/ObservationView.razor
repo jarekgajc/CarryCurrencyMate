@@ -1,14 +1,8 @@
 ﻿@inject RequestLoaderFactory RequestLoaderFactory;
+@inject NavigationManager Navigation
 @implements IDisposable;
 
 <AccountCurrencyPicker />
-<h1>Base currency: @AccountPreferenceState.Value.Currency</h1>
-<MudPopover Open="true" OverflowBehavior="OverflowBehavior.FlipAlways" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Paper="false">
-    <MudPaper Outlined="true" Class="px-4 py-8">
-        <MudText>Scroll your browser to see effect.</MudText>
-    </MudPaper>
-</MudPopover>
-
 @if(_observation != null)
 {
     <MudTable Items="@_observationTableData.Rows" Hover="true" Breakpoint="Breakpoint.Sm" OnRowClick="RowClickEvent" T="ObservationTableData.Row">
@@ -102,7 +96,7 @@ else if(_showEditObserverTip)
 
     private void RowClickEvent(TableRowClickEventArgs<ObservationTableData.Row> tableRowClickEventArgs)
     {
-        
+        Navigation.NavigateTo($"/exchange/{CurrencyUtils.ToPair(_query.BaseCurrency, tableRowClickEventArgs.Item.Currency)}");
     }
 
     public async Task LoadObservation()
