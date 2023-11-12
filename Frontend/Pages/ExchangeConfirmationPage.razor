@@ -1,0 +1,22 @@
+﻿@page "/exchange/{CurrencyPair}/confirmation"
+
+<PageTitle>Exchange @CurrencyPair</PageTitle>
+
+<ExchangeConfirmationView From="_from" To="_to" Value="Value"/>
+
+@code {
+    private Currency _from;
+    private Currency _to;
+
+    [Parameter]
+    public string CurrencyPair { get; set; } = default!;
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public decimal Value { get; set; }
+
+    protected override void OnInitialized()
+    {
+        CurrencyUtils.FromPair(CurrencyPair, out _from, out _to);
+    }
+
+}

@@ -1,0 +1,91 @@
+﻿@using Common.Models.Exchanges
+@inject RequestLoaderFactory RequestLoaderFactory;
+@inject Navigator Navigator
+
+@if (ExchangeRateValue != null)
+{
+    <MudCard>
+        <MudCardContent>
+            <MudSimpleTable Hover="true">
+                <tbody>
+                <tr>
+                    <td>Pay</td>
+                        <td>@_exchangeRequest.Value.Prettify() @_exchangeRequest.From</td>
+                </tr>
+                <tr>
+                    <td>Get</td>
+                        <td>@Get.Prettify() @_exchangeRequest.To</td>
+                </tr>
+                </tbody>
+            </MudSimpleTable>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Text" Color="Color.Secondary" @onclick="Cancel">Cancel</MudButton>
+            <MudSpacer/>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" @onclick="Confirm">Confirm</MudButton>
+        </MudCardActions>
+    </MudCard>
+}
+
+@code {
+    private Observation? _observation;
+    private ObservationQuery _query = default!;
+    private ExchangeRequest _exchangeRequest = default!;
+
+    [CascadingParameter]
+    public ObserversState ObserversState { get; set; } = default!;
+
+    [CascadingParameter]
+    private RequestLoadController RequestLoadController { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Currency From { get; set; }
+    [Parameter, EditorRequired]
+    public Currency To { get; set; }
+    [Parameter, EditorRequired]
+    public decimal Value { get; set; }
+
+    public decimal Pay { get; set; } = default!;
+    public decimal Get { get; set; } = default!;
+    public ExchangeRateValue? ExchangeRateValue { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _query = new ObservationQuery
+        {
+            BaseCurrency = From,
+            Currencies = new List<Currency> {To},
+            Observer = ObserversState.Default!,
+            TimeRange = TimeRange.CURRENT
+        };
+
+        _exchangeRequest = new ExchangeRequest
+        {
+            From = From,
+            To = To,
+            ObserverId = _query.Observer.Id,
+            Value = Value
+        };
+
+        _observation = await RequestLoaderFactory
+            .CreateApiCaller($"api/observations?q={Base64Utils.FromObject(_query)}", RequestLoadController)
+            .GetItems<Observation>();
+        
+        if (_observation != null)
+        {
+            ExchangeRateValue = _observation.ExchangeRates[0].Values[0];
+            Get = _exchangeRequest.Value * ExchangeRateValue.Buy;
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigator.GoToExchange(CurrencyUtils.ToPair(From, To));
+    }
+
+    private void Confirm()
+    {
+        
+    }
+
+}

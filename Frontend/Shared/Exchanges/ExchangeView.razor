@@ -1,5 +1,6 @@
 ﻿@using Common.Models.Exchanges
 @inject RequestLoaderFactory RequestLoaderFactory;
+@inject Navigator Navigator
 
 @if (ExchangeRateValue != null)
 {
@@ -7,10 +8,10 @@
         <MudTabs ActivePanelIndexChanged="OnChangeActivePanelIndex">
             <MudCardContent>
                 <MudTabPanel Text="@string.Concat("Buy ", To)">
-                    <ExchangeForm Buying="true" A="A" B="B" ExchangeRate="ExchangeRateValue.Buy" OnChangeValue="OnChangeFieldValue"/>
+                    <ExchangeForm ExchangeType="ExchangeType.Buy" A="A" B="B" ExchangeRate="ExchangeRateValue.Buy" OnChangeValue="OnChangeFieldValue"/>
                 </MudTabPanel>
                 <MudTabPanel Text="@string.Concat("Sell ", To)">
-                    <ExchangeForm Buying="false" A="B" B="A" ExchangeRate="ExchangeRateValue.Sell" OnChangeValue="OnChangeFieldValue"/>
+                    <ExchangeForm ExchangeType="ExchangeType.Sell" A="B" B="A" ExchangeRate="ExchangeRateValue.Sell" OnChangeValue="OnChangeFieldValue" />
                 </MudTabPanel>
             </MudCardContent>
         </MudTabs>
@@ -26,6 +27,7 @@
     private Observation? _observation;
     private ObservationQuery _query = default!;
     private ExchangeRequest? _exchangeRequest = default!;
+    private ExchangeType _exchangeType;
 
     [CascadingParameter]
     public ObserversState ObserversState { get; set; } = default!;
@@ -79,12 +81,17 @@
 
     private void Cancel()
     {
-        
+        Navigator.GoToObservation();
     }
 
     private void Continue()
     {
-
+        //TODO: fix
+        decimal? value = A.Value;
+        if (value.HasValue)
+        {
+            Navigator.GoToExchangeConfirmation(CurrencyUtils.ToPair(From, To), value.Value, _exchangeType);
+        }
     }
 
     private void OnChangeActivePanelIndex()
@@ -93,9 +100,9 @@
         B = new ExchangeForm.Field(To);
     }
 
-    private void OnChangeFieldValue()
+    private void OnChangeFieldValue(ExchangeType exchangeType)
     {
-        
+        _exchangeType = exchangeType;
     }
 
 }
