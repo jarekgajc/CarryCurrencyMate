@@ -11,6 +11,8 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Globalization;
 using System.Text;
+using Backend.Services.ExchangerServices;
+using Backend.Services.ExchangeServices;
 
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
@@ -55,6 +57,8 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountPreferenceService, AccountPreferenceService>();
 builder.Services.AddScoped<IObserverService, ObserverService>();
 builder.Services.AddScoped<IObservationService, ObservationService>();
+builder.Services.AddScoped<IExchangerService, ExchangerService>();
+builder.Services.AddScoped<IExchangeService, ExchangeService>();
 builder.Services.AddDbContext<DataContext>();
 
 //CORS

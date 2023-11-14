@@ -47,7 +47,7 @@ namespace Common.Models.Observations
         }
     }
 
-    public enum Currency
+    public enum Currency : short
     {
         USD, EUR, PLN
     }

@@ -9,10 +9,11 @@ namespace Common.Models.Exchanges
 {
     public class ExchangeDto
     {
-        public required Currency From { get; set; }
-        public required Currency To { get; set; }
-        public required long ObserverId { get; set; }
-        public required decimal Value { get; set; }
+        public string Id { get; set; } = string.Empty;
+        public required string SourceId { get; set; }
+        public required Volume From { get; set; }
+        public required Volume To { get; set; }
+        public required long ExchangerId { get; set; }
         public required long Timestamp { get; set; }
     }
 }

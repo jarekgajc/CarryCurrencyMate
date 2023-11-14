@@ -31,9 +31,9 @@ namespace Common.Models.Observers.Sources
             observation.ExchangeRates = (await Task.WhenAll( query.Currencies.Select(async currency =>
             {
                 CurrentExchangeRate currentExchangeRate = await client.GetCurrentExchangeRate(query.BaseCurrency, currency);
-                if(!currentExchangeRate.success || currentExchangeRate.result == null)
+                if(!currentExchangeRate.Success || currentExchangeRate.Result == null)
                 {
-                    throw new SourceClientException(currentExchangeRate.GetErrorsDescriptions());
+                    throw new SourceClientException(IResponse.GetErrorsDescriptions(currentExchangeRate));
                 }
                 
                 return new ExchangeRate
@@ -43,8 +43,8 @@ namespace Common.Models.Observers.Sources
                     {
                         new ExchangeRateValue
                         {
-                            Buy = decimal.Parse(currentExchangeRate.result.buyRate),
-                            Sell = decimal.Parse(currentExchangeRate.result.sellRate),
+                            Buy = decimal.Parse(currentExchangeRate.Result.BuyRate),
+                            Sell = decimal.Parse(currentExchangeRate.Result.SellRate),
                             Time = dateTime
                         }
                     }

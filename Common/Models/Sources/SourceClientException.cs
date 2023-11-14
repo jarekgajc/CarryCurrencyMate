@@ -16,6 +16,11 @@ namespace Common.Models.Sources
             Errors = errors;
         }
 
+        public SourceClientException(string error)
+        {
+            Errors = new List<string> {error};
+        }
+
         public SourceClientException() {}
 
         public SourceClientException(HttpResponseMessage response)

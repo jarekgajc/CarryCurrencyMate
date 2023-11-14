@@ -10,11 +10,11 @@
                 <tbody>
                 <tr>
                     <td>Pay</td>
-                        <td>@_exchangeRequest.Value.Prettify() @_exchangeRequest.From</td>
+                    <td>@_exchangeRequest.Value.Prettify() @_exchangeRequest.From</td>
                 </tr>
                 <tr>
                     <td>Get</td>
-                        <td>@Get.Prettify() @_exchangeRequest.To</td>
+                    <td>@Get.Prettify() @_exchangeRequest.To</td>
                 </tr>
                 </tbody>
             </MudSimpleTable>
@@ -59,13 +59,14 @@
             TimeRange = TimeRange.CURRENT
         };
 
-        _exchangeRequest = new ExchangeRequest
-        {
-            From = From,
-            To = To,
-            ObserverId = _query.Observer.Id,
-            Value = Value
-        };
+        //TODO: set
+        // _exchangeRequest = new ExchangeRequest
+        // {
+        //     From = From,
+        //     To = To,
+        //     ObserverId = _query.Observer.Id,
+        //     Value = Value
+        // };
 
         _observation = await RequestLoaderFactory
             .CreateApiCaller($"api/observations?q={Base64Utils.FromObject(_query)}", RequestLoadController)

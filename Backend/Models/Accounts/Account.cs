@@ -1,4 +1,5 @@
-﻿using Backend.Models.Observers;
+﻿using Backend.Models.Exchangers;
+using Backend.Models.Observers;
 using Backend.Models.Users;
 using Common.Models.Accounts;
 
@@ -10,6 +11,7 @@ namespace Backend.Models.Accounts
 
         public required User User { get; set; }
         public required List<Observer> Observers { get; set; }
+        public required List<Exchanger> Exchangers { get; set; }
 
         public AccountDto ToDto() {
             return new AccountDto

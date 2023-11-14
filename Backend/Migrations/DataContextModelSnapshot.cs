@@ -51,14 +51,40 @@ namespace Backend.Migrations
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Currency")
-                        .HasColumnType("int");
+                    b.Property<short>("Currency")
+                        .HasColumnType("smallint");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AccountId");
 
                     b.ToTable("AccountPreferences");
+                });
+
+            modelBuilder.Entity("Backend.Models.Exchangers.Exchanger", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int?>("AccountId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Source")
+                        .HasColumnType("int");
+
+                    b.Property<long>("SourceAuthId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("SourceAuthId");
+
+                    b.ToTable("Exchangers");
                 });
 
             modelBuilder.Entity("Backend.Models.Observers.Observer", b =>
@@ -146,6 +172,21 @@ namespace Backend.Migrations
                     b.Navigation("Account");
                 });
 
+            modelBuilder.Entity("Backend.Models.Exchangers.Exchanger", b =>
+                {
+                    b.HasOne("Backend.Models.Accounts.Account", null)
+                        .WithMany("Exchangers")
+                        .HasForeignKey("AccountId");
+
+                    b.HasOne("Backend.Models.Sources.Auths.SourceAuth", "SourceAuth")
+                        .WithMany()
+                        .HasForeignKey("SourceAuthId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SourceAuth");
+                });
+
             modelBuilder.Entity("Backend.Models.Observers.Observer", b =>
                 {
                     b.HasOne("Backend.Models.Accounts.Account", null)
@@ -163,6 +204,8 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Accounts.Account", b =>
                 {
+                    b.Navigation("Exchangers");
+
                     b.Navigation("Observers");
                 });
 #pragma warning restore 612, 618

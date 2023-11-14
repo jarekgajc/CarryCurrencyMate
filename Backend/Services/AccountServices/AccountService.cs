@@ -1,6 +1,7 @@
 ﻿using Backend.Data;
 using Backend.Models.Accounts;
 using Backend.Models.Exceptions;
+using Backend.Models.Exchangers;
 using Backend.Models.Users;
 using Common.Models.Error.Api;
 using Microsoft.EntityFrameworkCore;
@@ -35,13 +36,23 @@ namespace Backend.Services.AccountServices
                 .FirstOrDefaultAsync() ?? throw new ApiException(new ResourceDoesNotExist());
         }
 
+        public async Task<Account> GetAccountIncludeExchangers(int id)
+        {
+            return await _dataContext.Accounts
+                .Where(account => account.Id == id)
+                .Include(account => account.Exchangers)
+                    .ThenInclude(exchanger => exchanger.SourceAuth)
+                .FirstOrDefaultAsync() ?? throw new ApiException(new ResourceDoesNotExist());
+        }
+
         public async Task<Account> GetOrCreateUserAccount(User user)
         {
             Account? account = await _dataContext.Accounts.Where(account => account.User.Id == user.Id).FirstOrDefaultAsync();
             account ??= await CreateAccount(new Account
                 {
                     User = user,
-                    Observers = new List<Models.Observers.Observer>()
+                    Observers = new List<Models.Observers.Observer>(),
+                    Exchangers = new List<Exchanger>()
                 });
             return account;
         }

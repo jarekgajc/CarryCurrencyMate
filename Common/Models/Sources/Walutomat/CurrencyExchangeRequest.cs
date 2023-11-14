@@ -6,41 +6,15 @@ using System.Threading.Tasks;
 
 namespace Common.Models.Sources.Walutomat
 {
-    //"{\"success\":false,\"errors\":[{\"key\":\"CURRENCY_NOT_SUPPORTED\",\"description\":\"Unsupported currency pair.\",\"errorData\":[]}]}"
+    //"currencyPair=EURPLN&buySell=SELL&volume=90.00&volumeCurrency=EUR&submitId=test107&ts=2018-10-08T13:15:00.000Z"
     public class CurrencyExchangeRequest
     {
-        public bool success { get; set; }
-        public List<Error>? errors { get; set; }
-        public Result? result { get; set; }
-
-        public List<string>? GetErrorsDescriptions()
-        {
-            if (errors == null)
-                return null;
-
-            return errors.Select(error  => error.description.ToString()).ToList();
-        }
-
-        public class Result
-        {
-            public required DateTime ts { get; set; }
-            public required string currencyPair { get; set; }
-            public required string buyRate { get; set; }
-            public required string sellRate { get; set; }
-        }
-
-        public class Error
-        {
-            public required string key { get; set; }
-            public required string description { get; set; }
-            public required List<Data> errorData { get; set; }
-
-            public class Data
-            {
-                public required string key { get; set; }
-                public required string value { get; set; }
-            }
-        }
-
+        public required bool DryRun { get; set; }
+        public string? SubmitId { get; set; }
+        public required string CurrencyPair { get; set; }
+        public required string BuySell { get; set; }
+        public required string Volume { get; set; }
+        public required string VolumeCurrency { get; set; }
+        public required DateTime Ts { get; set; }
     }
 }

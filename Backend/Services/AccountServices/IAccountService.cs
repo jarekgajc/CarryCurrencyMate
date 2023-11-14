@@ -7,6 +7,7 @@ namespace Backend.Services.AccountServices
     {
         Task<Account> GetAccount(int id);
         Task<Account> GetAccountIncludeObservers(int id);
+        Task<Account> GetAccountIncludeExchangers(int id);
         Task<Account> GetOrCreateUserAccount(User user);
     }
 }

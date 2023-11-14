@@ -26,7 +26,6 @@
 @code {
     private Observation? _observation;
     private ObservationQuery _query = default!;
-    private ExchangeRequest? _exchangeRequest = default!;
     private ExchangeType _exchangeType;
 
     [CascadingParameter]
@@ -54,14 +53,6 @@
             Currencies = new List<Currency> {To},
             Observer = ObserversState.Default!,
             TimeRange = TimeRange.CURRENT
-        };
-
-        _exchangeRequest = new ExchangeRequest
-        {
-            From = From,
-            To = To,
-            ObserverId = _query.Observer.Id,
-            Value = 0
         };
 
         _observation = await RequestLoaderFactory
