@@ -17,7 +17,9 @@
     private RequestLoadController RequestLoadController { get; set; } = default!;
 
     protected override async Task OnInitializedAsync() {
-        _observersState = ObjectsStateFactory.Create<ObserversState>(RequestLoadController);
+        _observersState = ObjectsStateFactory.CreateOrGetCached<ObserversState>(RequestLoadController);
+        if(_observersState.Valid)
+            return;
         await _observersState.GetObjects();
     }
 }

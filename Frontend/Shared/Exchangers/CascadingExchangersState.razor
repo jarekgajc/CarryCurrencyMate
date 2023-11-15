@@ -17,7 +17,10 @@
     private RequestLoadController RequestLoadController { get; set; } = default!;
 
     protected override async Task OnInitializedAsync() {
-        _exchangersState = ObjectsStateFactory.Create<ExchangersState>(RequestLoadController);
+        _exchangersState = ObjectsStateFactory.CreateOrGetCached<ExchangersState>(RequestLoadController);
+        if(_exchangersState.Valid) 
+            return;
+
         await _exchangersState.GetObjects();
     }
 }
