@@ -1,0 +1,23 @@
+﻿@inject ObjectsStateFactory ObjectsStateFactory;
+
+@if (_exchangersState?.Valid == true)
+{
+    <CascadingValue Value="_exchangersState">
+        @ChildContent
+    </CascadingValue>
+}
+
+@code {
+    private ExchangersState? _exchangersState;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = default!;
+
+    [CascadingParameter]
+    private RequestLoadController RequestLoadController { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync() {
+        _exchangersState = ObjectsStateFactory.Create<ExchangersState>(RequestLoadController);
+        await _exchangersState.GetObjects();
+    }
+}

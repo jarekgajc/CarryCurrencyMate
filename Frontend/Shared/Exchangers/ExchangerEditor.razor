@@ -1,0 +1,62 @@
+﻿@using Common.Models.Exchangers.Sources;
+@using Common.Models.Exchangers
+<MudCardHeader>
+    <CardHeaderContent>
+        <MudText Typo="Typo.h6">Exchanger</MudText>
+    </CardHeaderContent>
+</MudCardHeader>
+@if (_editorState != null && _exchangerSource != null)
+{
+    <MudCardContent>
+        <MudSelect T="ExchangeSource" Value="Value.Source" ValueChanged="OnChangeSource" Label="Source" AnchorOrigin="Origin.BottomCenter">
+            @foreach (ExchangeSource exchangeSource in Enum.GetValues(typeof(ExchangeSource)))
+            {
+                <MudSelectItem Value="@exchangeSource"/>
+            }
+        </MudSelect>
+        <SourceAuthEditor Type="@_exchangerSource.SourceAuthType" Holder="@Value" />
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton Variant="Variant.Text" Color="Color.Secondary" @onclick="Cancel">Cancel</MudButton>
+        <MudSpacer/>
+        <MudButton Variant="Variant.Text" Color="Color.Primary" @onclick="Save">Save</MudButton>
+    </MudCardActions>
+}
+
+@code {
+    [Parameter] public ExchangerDto? Exchanger { get; set; }
+    [Parameter, EditorRequired] public Action OnHide { get; set; } = default!;
+    [Parameter, EditorRequired] public SaveEditorState<ExchangerDto> OnSave { get; set; } = default!;
+
+    private IExchangerSource? _exchangerSource;
+    private EditorState<ExchangerDto>? _editorState;
+    public ExchangerDto Value => _editorState!.Value;
+
+    [CascadingParameter]
+    private RequestLoadController RequestLoadController { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        _editorState = new EditorState<ExchangerDto>(Exchanger);
+        OnChangeSource(Value.Source);
+    }
+
+    private void OnChangeSource(ExchangeSource exchangeSource)
+    {
+        //TODO: Value.Source may not change (check if you have ro set it manually)
+        _exchangerSource = IExchangerSource.GetInstance(exchangeSource);
+    }
+
+    public async void Save()
+    {
+        if(await OnSave(_editorState!) != null)
+        {
+            OnHide();
+        }
+    }
+
+    public void Cancel()
+    {
+        OnHide();
+    }
+}

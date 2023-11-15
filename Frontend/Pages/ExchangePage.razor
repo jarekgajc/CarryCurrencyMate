@@ -2,7 +2,15 @@
 
 <PageTitle>Exchange @CurrencyPair</PageTitle>
 
-<ExchangeView From="_from" To="_to"/>
+<CascadingObserversState>
+    <CascadingExchangersState>
+        <DefaultObserverRequired>
+            <DefaultExchangerRequired>
+                <ExchangeView From="_from" To="_to" />
+            </DefaultExchangerRequired>
+        </DefaultObserverRequired>
+    </CascadingExchangersState>
+</CascadingObserversState>
 
 @code {
     private Currency _from;
