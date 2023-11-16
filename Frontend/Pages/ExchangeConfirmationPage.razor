@@ -1,22 +1,36 @@
 ﻿@page "/exchange/{CurrencyPair}/confirmation"
+@using Common.Models.Exchanges
 
 <PageTitle>Exchange @CurrencyPair</PageTitle>
 
-<ExchangeConfirmationView From="_from" To="_to" Value="Value"/>
+<CascadingObserversState>
+    <CascadingExchangersState>
+        <DefaultObserverRequired>
+            <DefaultExchangerRequired>
+                <ExchangeConfirmationView From="_from" To="_to" Value="Value" ExchangeType="_exchangeType" />
+            </DefaultExchangerRequired>
+        </DefaultObserverRequired>
+    </CascadingExchangersState>
+</CascadingObserversState>
 
 @code {
     private Currency _from;
     private Currency _to;
+    private ExchangeType _exchangeType;
 
     [Parameter]
     public string CurrencyPair { get; set; } = default!;
     [Parameter]
     [SupplyParameterFromQuery]
     public decimal Value { get; set; }
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? ExchangeTypeParam { get; set; }
 
     protected override void OnInitialized()
     {
         CurrencyUtils.FromPair(CurrencyPair, out _from, out _to);
+        Enum.TryParse(ExchangeTypeParam, out _exchangeType);
     }
 
 }

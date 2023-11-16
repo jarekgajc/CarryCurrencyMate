@@ -22,7 +22,7 @@ public class Navigator {
 
     public void GoToExchangeConfirmation(string currencyPair, decimal value, ExchangeType exchangeType)
     {
-        GoForward($"/exchange/{currencyPair}/confirmation?value={value}");
+        GoForward($"/exchange/{currencyPair}/confirmation?value={value}&exchangeType={exchangeType}");
     }
 
     public void GoToObservation()

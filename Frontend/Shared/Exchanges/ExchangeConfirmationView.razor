@@ -1,5 +1,6 @@
 ﻿@using Common.Models.Exchanges
 @inject RequestLoaderFactory RequestLoaderFactory;
+@inject ISnackbar Snackbar
 @inject Navigator Navigator
 
 @if (ExchangeRateValue != null)
@@ -13,7 +14,7 @@
                     <td>@_exchangeRequest.Value.Prettify() @_exchangeRequest.From</td>
                 </tr>
                 <tr>
-                    <td>Get</td>
+                    <td>Get (approx.)</td>
                     <td>@Get.Prettify() @_exchangeRequest.To</td>
                 </tr>
                 </tbody>
@@ -36,6 +37,9 @@
     public ObserversState ObserversState { get; set; } = default!;
 
     [CascadingParameter]
+    public ExchangersState ExchangersState { get; set; } = default!;
+
+    [CascadingParameter]
     private RequestLoadController RequestLoadController { get; set; } = default!;
 
     [Parameter, EditorRequired]
@@ -44,8 +48,9 @@
     public Currency To { get; set; }
     [Parameter, EditorRequired]
     public decimal Value { get; set; }
+    [Parameter, EditorRequired]
+    public ExchangeType ExchangeType { get; set; }
 
-    public decimal Pay { get; set; } = default!;
     public decimal Get { get; set; } = default!;
     public ExchangeRateValue? ExchangeRateValue { get; set; }
 
@@ -59,15 +64,6 @@
             TimeRange = TimeRange.CURRENT
         };
 
-        //TODO: set
-        // _exchangeRequest = new ExchangeRequest
-        // {
-        //     From = From,
-        //     To = To,
-        //     ObserverId = _query.Observer.Id,
-        //     Value = Value
-        // };
-
         _observation = await RequestLoaderFactory
             .CreateApiCaller($"api/observations?q={Base64Utils.FromObject(_query)}", RequestLoadController)
             .GetItems<Observation>();
@@ -75,7 +71,19 @@
         if (_observation != null)
         {
             ExchangeRateValue = _observation.ExchangeRates[0].Values[0];
-            Get = _exchangeRequest.Value * ExchangeRateValue.Buy;
+            //TODO: test
+            Get = ExchangeType == ExchangeType.Buy ? Value * ExchangeRateValue.Buy : _exchangeRequest.Value * (1 / ExchangeRateValue.Sell);
+
+            _exchangeRequest = new ExchangeRequest()
+            {
+                Type = ExchangeType,
+                From = From,
+                To = To,
+                Value = Value,
+                Exchanger = ExchangersState.Default!,
+                DryRun = true,
+                Timestamp = ExchangeRateValue!.Time
+            };
         }
     }
 
@@ -84,9 +92,15 @@
         Navigator.GoToExchange(CurrencyUtils.ToPair(From, To));
     }
 
-    private void Confirm()
+    private async void Confirm()
     {
-        
+        //TODO: update path
+        await RequestLoaderFactory
+            .CreateApiCaller($"api/(maybe a proper request?!)", RequestLoadController)
+            .CreateItem(_exchangeRequest);
+
+        Snackbar.Add("Exchange has been completed", Severity.Success);
+        Navigator.GoToObservation();
     }
 
 }

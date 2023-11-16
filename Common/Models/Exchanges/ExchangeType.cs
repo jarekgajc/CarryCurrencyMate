@@ -7,7 +7,7 @@ using Common.Models.Observations;
 
 namespace Common.Models.Exchanges
 {
-    public enum ExchangeType
+    public enum ExchangeType : byte
     {
         Buy, Sell
     }
