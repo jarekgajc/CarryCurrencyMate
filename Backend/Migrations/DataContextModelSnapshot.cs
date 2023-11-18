@@ -129,6 +129,65 @@ namespace Backend.Migrations
                     b.ToTable("SourceAuths");
                 });
 
+            modelBuilder.Entity("Backend.Models.Transactions.Transaction", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(32)
+                        .HasColumnType("char");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<short>("Currency")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("ExternalId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("SourceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("TransactionSourceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TransactionSourceId");
+
+                    b.ToTable("Transactions");
+                });
+
+            modelBuilder.Entity("Backend.Models.Transactions.TransactionSource", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int?>("AccountId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("InfoMap")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("TransactionSources");
+                });
+
             modelBuilder.Entity("Backend.Models.Users.User", b =>
                 {
                     b.Property<int>("Id")
@@ -202,11 +261,32 @@ namespace Backend.Migrations
                     b.Navigation("SourceAuth");
                 });
 
+            modelBuilder.Entity("Backend.Models.Transactions.Transaction", b =>
+                {
+                    b.HasOne("Backend.Models.Transactions.TransactionSource", null)
+                        .WithMany("Transactions")
+                        .HasForeignKey("TransactionSourceId");
+                });
+
+            modelBuilder.Entity("Backend.Models.Transactions.TransactionSource", b =>
+                {
+                    b.HasOne("Backend.Models.Accounts.Account", null)
+                        .WithMany("TransactionSources")
+                        .HasForeignKey("AccountId");
+                });
+
             modelBuilder.Entity("Backend.Models.Accounts.Account", b =>
                 {
                     b.Navigation("Exchangers");
 
                     b.Navigation("Observers");
+
+                    b.Navigation("TransactionSources");
+                });
+
+            modelBuilder.Entity("Backend.Models.Transactions.TransactionSource", b =>
+                {
+                    b.Navigation("Transactions");
                 });
 #pragma warning restore 612, 618
         }

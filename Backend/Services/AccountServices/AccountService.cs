@@ -2,9 +2,11 @@
 using Backend.Models.Accounts;
 using Backend.Models.Exceptions;
 using Backend.Models.Exchangers;
+using Backend.Models.Transactions;
 using Backend.Models.Users;
 using Common.Models.Error.Api;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Backend.Services.AccountServices
 {
@@ -44,6 +46,13 @@ namespace Backend.Services.AccountServices
                     .ThenInclude(exchanger => exchanger.SourceAuth)
                 .FirstOrDefaultAsync() ?? throw new ApiException(new ResourceDoesNotExist());
         }
+        
+        public IIncludableQueryable<Account, List<TransactionSource>> GetAccountIncludeTransactionSources(int id)
+        {
+            return _dataContext.Accounts
+                .Where(account => account.Id == id)
+                .Include(account => account.TransactionSources);
+        }
 
         public async Task<Account> GetOrCreateUserAccount(User user)
         {
@@ -52,7 +61,8 @@ namespace Backend.Services.AccountServices
                 {
                     User = user,
                     Observers = new List<Models.Observers.Observer>(),
-                    Exchangers = new List<Exchanger>()
+                    Exchangers = new List<Exchanger>(),
+                    TransactionSources = new List<TransactionSource>()
                 });
             return account;
         }
